@@ -1,9 +1,6 @@
-import { DrawerExample } from './components/chakraui/DrawerExample';
-
 export default function Home() {
   return (
     <main>
-      <DrawerExample />
       <section>
         <div
           className={
@@ -30,6 +27,7 @@ export default function Home() {
         >
           -
         </div>
+        <div className={'2xl:bg-red-500'}>-</div>
       </section>
     </main>
   );

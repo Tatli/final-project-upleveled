@@ -14,7 +14,6 @@ export default function Offers() {
       <Offer />
       <Offer />
       <Offer />
-      <Offer />
     </div>
   );
 }
