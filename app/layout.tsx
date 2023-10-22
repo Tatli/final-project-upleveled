@@ -24,7 +24,8 @@ export default function RootLayout({
         {/* <ChakraProvider> */}
         {/* <NavWithAction /> */}
         <Navbar />
-        <div className=" mx-2 sm:mx-8 lg:mx-24 2xl:mx-40">{children}</div>
+        {/* <div className=" mx-2 sm:mx-8 lg:mx-24 2xl:mx-40">{children}</div> */}
+        <div>{children}</div>
         {/* <SmallFooterWithLogoLeft /> */}
         {/* </ChakraProvider> */}
       </body>

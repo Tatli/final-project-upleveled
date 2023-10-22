@@ -12,6 +12,11 @@ export default function Navbar() {
       <div className="flex-none">
         <ul className="menu menu-horizontal px-1">
           <li>
+            <Link className={`px-8`} href="/#">
+              Create new listing
+            </Link>
+          </li>
+          <li>
             <Link href="/login">Login</Link>
           </li>
           <li className="pr-5">
