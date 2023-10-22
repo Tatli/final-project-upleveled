@@ -22,7 +22,7 @@ export default function Navbar() {
               <summary className="mx-2">Username</summary>
               <ul className="bg-base-100 z-10">
                 <li>
-                  <Link href="/profile">View Profile</Link>
+                  <Link href="/settings">View Profile</Link>
                 </li>
                 <li>
                   <Link href="/offers">Offers</Link>

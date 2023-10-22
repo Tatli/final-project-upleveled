@@ -1,6 +1,6 @@
 import Image from 'next/image';
 
-export default function Profile() {
+export default function Settings() {
   return (
     <div className={`grid grid-cols-12 pt-16`}>
       <div className={`col-span-3`}>
@@ -8,8 +8,7 @@ export default function Profile() {
         <hr />
         <br />
         <ul>
-          <li>Profile</li>
-          <li>Password</li>
+          <li className={`text-primary`}>Profile</li>
         </ul>
       </div>
       <div className={`col-span-1`}>1/12</div>
@@ -77,15 +76,31 @@ export default function Profile() {
             placeholder="Postal code"
             className="input input-bordered w-full mb-2"
           />
-          <h2 className={`text-2xl my-2`}>Contact</h2>
+          <h2 className={`text-2xl my-2`}>Private information</h2>
           <label className="label">
             <span className="label-text">Email</span>
           </label>
-          <input
-            type="email"
-            placeholder="your@email.xyz"
-            className="input input-bordered w-full mb-2"
-          />
+          <div className={`join`}>
+            <input
+              type="email"
+              placeholder="your@email.xyz"
+              className="input input-bordered join-item w-full mb-2"
+            />
+            <button className="btn join-item rounded-r-full">Change</button>
+          </div>
+
+          <label className="label">
+            <span className="label-text">Password</span>
+          </label>
+          <div className={`join`}>
+            <input
+              type="password"
+              placeholder="password"
+              className="input input-bordered join-item w-full mb-2"
+            />
+            <button className="btn join-item rounded-r-full">Change</button>
+          </div>
+
           <label className="label">
             <span className="label-text">Phone</span>
           </label>
@@ -94,6 +109,7 @@ export default function Profile() {
             placeholder="06XX 123 456 78"
             className="input input-bordered w-full mb-2"
           />
+          <button className="btn btn-primary my-4">Save</button>
         </div>
       </div>
 
@@ -104,34 +120,36 @@ export default function Profile() {
           <h2 className={`text-2xl mb-8`}>Profile picture</h2>
           <Image
             src="/images/profile/default-male.jpg"
-            width={228}
-            height={224}
+            width={285}
+            height={516}
             alt="Picture of the user"
           ></Image>
           <button className="btn btn-primary my-4">Upload Image</button>
 
           <h2 className={`text-2xl my-4`}>Profile type</h2>
-          <label for="profileType">
-            <input
-              type="radio"
-              id="private"
-              name="profileType"
-              className={`radio radio-primary`}
-              value="p"
-            />
-            Private
-          </label>
 
-          <label for="profileType">
-            <input
-              type="radio"
-              id="commercial"
-              name="profileType"
-              className={`radio radio-primary`}
-              value="c"
-            />
-            Commercial
-          </label>
+          <div className="form-control">
+            <label className="label cursor-pointer">
+              <span className="label-text">Private</span>
+              <input
+                type="radio"
+                name="profileType"
+                className="radio checked:bg-primary"
+                checked
+              />
+            </label>
+          </div>
+          <div className="form-control">
+            <label className="label cursor-pointer">
+              <span className="label-text">Commercial</span>
+              <input
+                type="radio"
+                name="profileType"
+                className="radio checked:bg-primary"
+                checked
+              />
+            </label>
+          </div>
         </div>
       </div>
       <div className={`col-span-1`}>1/12</div>
