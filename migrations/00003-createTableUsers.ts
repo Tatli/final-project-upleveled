@@ -1,5 +1,21 @@
 import { Sql } from 'postgres';
 
+export type User = {
+  id: number;
+  firstName: string | null;
+  lastName: string | null;
+  birth_date: Date | null;
+  address: string | null;
+  postalCode: string | null;
+  city: string | null;
+  country: string | null;
+  email: string;
+  password: string;
+  phone: string | null;
+  image: string | null;
+  roleId: number;
+};
+
 export async function up(sql: Sql) {
   await sql`
 
