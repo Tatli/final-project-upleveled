@@ -1,0 +1,5 @@
+CREATE DATABASE final_project_upleveled;
+CREATE USER final_project_upleveled WITH ENCRYPTED PASSWORD 'final_project_upleveled';
+GRANT ALL PRIVILEGES ON DATABASE final_project_upleveled TO final_project_upleveled;
+\connect final_project_upleveled;
+CREATE SCHEMA final_project_upleveled AUTHORIZATION final_project_upleveled;
