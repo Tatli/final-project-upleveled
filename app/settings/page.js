@@ -3,7 +3,7 @@ import Image from 'next/image';
 export default function Settings() {
   return (
     <div className={`grid grid-cols-12 pt-16`}>
-      <div className={`col-span-3`}>
+      <div className={`col-span-2`}>
         <h1 className={`text-5xl pb-4`}>Settings</h1>
         <hr />
         <br />
@@ -11,8 +11,8 @@ export default function Settings() {
           <li className={`text-primary`}>Profile</li>
         </ul>
       </div>
-      <div className={`col-span-1`}>1/12</div>
-      <div className={`col-span-4`}>
+      <div className={`col-span-1`}></div>
+      <div className={`col-span-5`}>
         <h1 className={`text-5xl pb-4`}>Profile</h1>
         <hr />
         <br />
@@ -113,9 +113,9 @@ export default function Settings() {
         </div>
       </div>
 
-      <div className={`col-span-1`}>1/12</div>
+      <div className={`col-span-1`}></div>
 
-      <div className={`col-span-3 mt-24`}>
+      <div className={`col-span-2 mt-24`}>
         <div className={`flex flex-col`}>
           <h2 className={`text-3xl mb-8`}>Profile picture</h2>
           <Image
@@ -152,7 +152,7 @@ export default function Settings() {
           </div>
         </div>
       </div>
-      {/* <div className={`col-span-1`}>1/12</div> */}
+      <div className={`col-span-1`}></div>
     </div>
   );
 }
