@@ -3,13 +3,34 @@ import Image from 'next/image';
 export default function Home() {
   return (
     <main>
-      <img
-        src="/images/home/hero/hero-cropped.jpg"
-        width="100%"
-        height="704px"
-        alt="Hero"
-        className={`object-contain`}
-      />
+      <section className="mx-0 sm:mx-0 lg:mx-0 2xl:mx-0">
+        <div
+          style={{
+            backgroundColor: 'red',
+            height: '408px',
+            minHeight: '480px',
+            maxHeight: '480px',
+            overflow: 'hidden',
+          }}
+        >
+          <div className={`[url('/public/images/home/hero/hero_cropped.jpg')]`}>
+            dsf
+          </div>
+          {/* <img
+            src="images/home/hero/hero_cropped.jpg"
+            width="100%"
+            alt="Hero"
+          /> */}
+          <div>
+            <form>
+              <label>
+                Search
+                <input type="text" />
+              </label>
+            </form>
+          </div>
+        </div>
+      </section>
     </main>
   );
 }

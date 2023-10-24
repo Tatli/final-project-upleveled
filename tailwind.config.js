@@ -3,6 +3,9 @@ module.exports = {
   content: ['./app/**/*.{js,jsx,ts,tsx}'],
   theme: {
     extend: {
+      // backgroundImage: {
+      //   'bg-hero-image': "url('/image/home/hero/hero_cropped.jpg')",
+      // },
       maxWidth: {
         '1/4': '25%',
         '1/2': '240px',
