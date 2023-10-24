@@ -1,4 +1,4 @@
-import RegisterForm from '../components/register/daisyui/RegisterForm.js';
+import RegisterForm from '../components/register/daisyui/RegisterForm';
 
 export default function Register() {
   return (
