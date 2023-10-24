@@ -2,6 +2,7 @@ import { Sql } from 'postgres';
 
 export type User = {
   id: number;
+  username: string;
   firstName: string | null;
   lastName: string | null;
   birth_date: Date | null;
@@ -21,6 +22,7 @@ export async function up(sql: Sql) {
 
 CREATE TABLE users (
     id integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    username VARCHAR(150) ,
     first_name VARCHAR(150) ,
     last_name VARCHAR(150) ,
     birth_date DATE ,
@@ -32,7 +34,7 @@ CREATE TABLE users (
     password VARCHAR(50) NOT NULL,
     phone VARCHAR(30) ,
     image VARCHAR(255) ,
-    role_id integer REFERENCES profile_type(id)
+    role_id integer REFERENCES roles(id)
 );
 
 `;

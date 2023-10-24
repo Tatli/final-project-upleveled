@@ -22,12 +22,12 @@ export const getUserById = cache(async (id: number) => {
 });
 
 export const createUser = cache(
-  async (firstName: string, type: string, accessory: string) => {
+  async (username: string, email: string, password: string, roleId: number) => {
     const [user] = await sql<User[]>`
       INSERT INTO users
-        (first_name, type, accessory)
+        (username, email, password, role_id)
       VALUES
-        (${firstName}, ${type}, ${accessory})
+        (${username}, ${email}, ${password}, ${roleId})
       RETURNING *
     `;
 
@@ -41,8 +41,7 @@ export const updateUserById = cache(
       UPDATE users
       SET
         first_name = ${firstName},
-        type = ${type},
-        accessory = ${accessory}
+        -- Add fields
       WHERE
         id = ${id}
         RETURNING *
