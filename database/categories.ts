@@ -21,6 +21,18 @@ export const createCategory = cache(async (name: string, image: string) => {
   return category;
 });
 
+export const getCategoryById = cache(async (id: number) => {
+  const [category] = await sql<Category[]>`
+    SELECT
+      *
+    FROM
+      categories
+    WHERE
+      id = ${id}
+  `;
+  return category;
+});
+
 export const updateCategoryById = cache(async (id: number, name: string) => {
   const [category] = await sql<Category[]>`
       UPDATE categories

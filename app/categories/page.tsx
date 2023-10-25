@@ -35,7 +35,9 @@ export default async function CategoriesPage() {
             data-test-id={`category-type-${category.id}`}
           >
             <Link href={`/categories/${category.id}`}>
-              <div>{category.name}</div>
+              <div>
+                {category.name} <span>URL: {category.image}</span>
+              </div>
               {/* <Image
                 src={`${category.image}`} // To-add
                 alt={category.name}

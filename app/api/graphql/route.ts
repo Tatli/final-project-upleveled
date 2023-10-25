@@ -9,6 +9,7 @@ import {
   createCategory,
   deleteCategoryById,
   getCategories,
+  getCategoryById,
 } from '../../../database/categories';
 import { createRole, getRoles } from '../../../database/roles';
 import {
@@ -101,6 +102,8 @@ const typeDefs = gql`
     user(id: ID!): User
     roles: [Role]
     categories: [Category]
+    category(id: ID!): Category
+
     # loggedInUserByFirstName(firstName: String!): User
   }
 
@@ -151,6 +154,10 @@ const resolvers = {
 
     categories: async () => {
       return await getCategories();
+    },
+
+    category: async (parent: null, args: { id: string }) => {
+      return await getCategoryById(parseInt(args.id));
     },
     // loggedInUserByFirstName: async (
     //   parent: null,
