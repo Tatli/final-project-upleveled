@@ -8,3 +8,8 @@ export type CreateUserArgs = {
 export type CreateRoleArgs = {
   name: string;
 };
+
+export type CreateCategoryArgs = {
+  name: string;
+  image: string;
+};

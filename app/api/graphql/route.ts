@@ -5,7 +5,12 @@ import { makeExecutableSchema } from '@graphql-tools/schema';
 import { GraphQLError } from 'graphql';
 // import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
-import { createRole } from '../../../database/roles';
+import {
+  createCategory,
+  deleteCategoryById,
+  getCategories,
+} from '../../../database/categories';
+import { createRole, getRoles } from '../../../database/roles';
 import {
   createUser,
   deleteUserById,
@@ -13,7 +18,11 @@ import {
   getUsers,
 } from '../../../database/users';
 import { User } from '../../../migrations/00003-createTableUsers';
-import { CreateRoleArgs, CreateUserArgs } from '../../../util/types';
+import {
+  CreateCategoryArgs,
+  CreateRoleArgs,
+  CreateUserArgs,
+} from '../../../util/types';
 
 // export type GraphQlResponseBody =
 //   | {
@@ -47,9 +56,10 @@ const typeDefs = gql`
     id: ID!
     name: String
   }
-  type Categories {
+  type Category {
     id: ID!
-    name: [String]
+    name: String!
+    image: String!
   }
   type Status {
     id: ID!
@@ -89,10 +99,13 @@ const typeDefs = gql`
   type Query {
     users: [User]
     user(id: ID!): User
+    roles: [Role]
+    categories: [Category]
     # loggedInUserByFirstName(firstName: String!): User
   }
 
   type Mutation {
+    # Users
     createUser(
       username: String!
       email: String!
@@ -102,7 +115,15 @@ const typeDefs = gql`
 
     deleteUserById(id: ID!): User!
 
+    # Roles
     createRole(name: String!): Role!
+
+    # Categories
+    createCategory(name: String!, image: String): Category!
+
+    ## Delete
+    deleteCategoryById(id: ID!): User!
+
     # updateUserById(
     #   id: ID!
     #   firstName: String!
@@ -124,6 +145,13 @@ const resolvers = {
       return await getUserById(parseInt(args.id));
     },
 
+    roles: async () => {
+      return await getRoles();
+    },
+
+    categories: async () => {
+      return await getCategories();
+    },
     // loggedInUserByFirstName: async (
     //   parent: null,
     //   args: { firstName: string },
@@ -176,6 +204,21 @@ const resolvers = {
       return await createRole(args.name);
     },
 
+    createCategory: async (parent: null, args: CreateCategoryArgs) => {
+      if (
+        typeof args.name !== 'string' ||
+        typeof args.image !== 'string' ||
+        !args.name ||
+        !args.image
+      ) {
+        throw new GraphQLError('Required field is missing');
+      }
+      return await createCategory(args.name, args.image);
+    },
+
+    deleteCategoryById: async (parent: null, args: { id: string }) => {
+      return await deleteCategoryById(parseInt(args.id));
+    },
     //     updateUserById: async (parent: null, args: UserInput & { id: string }) => {
     //       if (
     //         typeof args.email !== 'string' ||
