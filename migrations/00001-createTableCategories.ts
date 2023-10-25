@@ -1,10 +1,16 @@
 import { Sql } from 'postgres';
 
+export type Category = {
+  name: string;
+  image: string;
+};
+
 export async function up(sql: Sql) {
   await sql`
 CREATE TABLE categories (
     id integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    name VARCHAR(255)
+    name VARCHAR(255),
+    image VARCHAR(255)
 );
 `;
 }
