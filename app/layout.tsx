@@ -47,8 +47,10 @@ export default async function RootLayout({
             <div className="flex-none">
               <ul className="menu menu-horizontal px-1">
                 <li>
-                  <Link className={`px-8`} href="/#">
-                    Create new listing
+                  <Link href="/#">
+                    <div className="badge badge-accent text-white p-2">
+                      Create new listing
+                    </div>
                   </Link>
                 </li>
                 <li>
