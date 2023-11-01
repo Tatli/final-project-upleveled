@@ -25,8 +25,8 @@ export type User = {
   city: string | null;
   country: string | null;
   email: string;
-  // password_hash: string;
+  password_hash: string;
   phone: string | null;
   image: string | null;
-  roleId: number;
+  roleId: number | null;
 };

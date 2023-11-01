@@ -81,3 +81,11 @@ export const getUserByUsername = cache(async (username: string) => {
   `;
   return user;
 });
+
+export async function isUserAdminBySessionToken(
+  sessionToken: string | undefined,
+) {
+  // FIX: Implement sessionToken check for current logged in users username
+  if (sessionToken === 'lucifer') return await true;
+  return await false;
+}

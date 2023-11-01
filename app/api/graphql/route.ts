@@ -20,6 +20,7 @@ import {
   getUserById,
   getUserByUsername,
   getUsers,
+  isUserAdminBySessionToken,
   updateUserById,
 } from '../../../database/users';
 import {
@@ -29,15 +30,15 @@ import {
   User,
 } from '../../../util/types';
 
-// export type GraphQlResponseBody =
-//   | {
-//       user: User;
-//     }
-//   | Error;
+export type GraphQlResponseBody =
+  | {
+      user: User;
+    }
+  | Error;
 
-// type FakeAdminUserContext = {
-//   isAdmin: boolean;
-// };
+type FakeAdminUserContext = {
+  isAdmin: boolean;
+};
 
 // type UserInput = {
 //   firstName: string;
@@ -133,6 +134,8 @@ const typeDefs = gql`
     # Authentication
     ## Login
     login(username: String!, password_hash: String!): User
+    ## Register
+    register(username: String!, password_hash: String!, email: String!): User
   }
 `;
 
@@ -168,6 +171,7 @@ const resolvers = {
 
   Mutation: {
     createUser: async (parent: null, args: CreateUserArgs) => {
+      // All of these checks are "end point based authentications"
       if (typeof args.username !== 'string' || !args.username) {
         throw new GraphQLError('Required field is missing');
       } else if (typeof args.email !== 'string' || !args.email) {
@@ -216,7 +220,14 @@ const resolvers = {
       return await updateCategoryById(parseInt(args.id), args.name, args.image);
     },
 
-    deleteCategoryById: async (parent: null, args: { id: string }) => {
+    deleteCategoryById: async (
+      parent: null,
+      args: { id: string },
+      context: FakeAdminUserContext,
+    ) => {
+      if (!context.isAdmin) {
+        throw new GraphQLError('Unauthorized operation');
+      }
       return await deleteCategoryById(parseInt(args.id));
     },
 
@@ -246,7 +257,30 @@ const resolvers = {
         maxAge: 60 * 60 * 24 * 30, // 30 days
       });
 
-      return await getUserByFirstName(args.username);
+      return await getUserByUsername(args.username);
+    },
+
+    register: async (
+      parent: null,
+      args: { username: string; password_hash: string; email: string },
+    ) => {
+      console.log('Inside register mutation');
+      console.log('username inside register mutation: ', args.username);
+      console.log(
+        'password_hash inside register mutation: ',
+        args.password_hash,
+      );
+      console.log('email inside register mutation: ', args.email);
+
+      // console.log('setting cookie fakeSession with username: ', args.username);
+      // cookies().set('fakeSession', args.username, {
+      //   httpOnly: true,
+      //   sameSite: 'lax',
+      //   path: '/',
+      //   maxAge: 60 * 60 * 24 * 30, // 30 days
+      // });
+
+      return await getUserByUsername(args.username);
     },
 
     //     updateUserById: async (parent: null, args: UserInput & { id: string }) => {
@@ -273,27 +307,27 @@ const apolloServer = new ApolloServer({
   schema,
 });
 
-const handler = startServerAndCreateNextHandler(apolloServer);
+const handler = startServerAndCreateNextHandler<NextRequest>(apolloServer, {
+  context: async (req) => {
+    // FIXME: Implement secure authentication
+    const fakeSessionToken = req.cookies.get('fakeSession');
 
-export async function GET(req: NextRequest) {
-  return await handler(req);
+    const isAdmin = await isUserAdminBySessionToken(fakeSessionToken?.value);
+
+    return { req, isAdmin };
+  },
+});
+
+export async function GET(
+  req: NextRequest,
+): Promise<NextResponse<GraphQlResponseBody>> {
+  return (await handler(req)) as NextResponse<GraphQlResponseBody>;
 }
-export async function POST(req: NextRequest) {
-  return await handler(req);
+export async function POST(
+  req: NextRequest,
+): Promise<NextResponse<GraphQlResponseBody>> {
+  return (await handler(req)) as NextResponse<GraphQlResponseBody>;
 }
-// const handler = startServerAndCreateNextHandler<NextRequest>(apolloServer, {
-//   context: async (req) => {
-//     // FIXME: Implement secure authentication and Authorization
-//     const fakeSessionToken = req.cookies.get('fakeSession');
-
-//     const isAdmin = await isUserAdminBySessionToken(fakeSessionToken?.value);
-
-//     return {
-//       req,
-//       isAdmin,
-//     };
-//   },
-// });
 
 // This setup is incomplete without type annotation
 // export async function GET(req: NextRequest) {
@@ -302,16 +336,4 @@ export async function POST(req: NextRequest) {
 
 // export async function POST(req: NextRequest) {
 //   return await handler(req);
-// }
-
-// export async function GET(
-//   req: NextRequest,
-// ): Promise<NextResponse<GraphQlResponseBody>> {
-//   return (await handler(req)) as NextResponse<GraphQlResponseBody>;
-// }
-
-// export async function POST(
-//   req: NextRequest,
-// ): Promise<NextResponse<GraphQlResponseBody>> {
-//   return (await handler(req)) as NextResponse<GraphQlResponseBody>;
 // }

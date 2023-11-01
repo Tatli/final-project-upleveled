@@ -1,69 +1,96 @@
 'use client';
-
+import { gql, useMutation } from '@apollo/client';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+
+const registerMutation = gql`
+  mutation Register($username: String!, $password: String!, $email: String!) {
+    register(username: $username, password_hash: $password, email: $email) {
+      id
+      username
+      email
+    }
+  }
+`;
 
 export default function RegisterForm() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
+  const [onError, setOnError] = useState('');
+  const router = useRouter();
 
-  async function handleRegister(event: React.FormEvent<HTMLFormElement>) {
-    // Take event and make request to register endpoint
+  const [registerHandler] = useMutation(registerMutation, {
+    variables: {
+      username,
+      password,
+      email,
+    },
 
-    // prevent default event
-    // first thing you should when running form element
-    event.preventDefault();
+    onError: (error) => {
+      console.log('username in onError: ', username);
+      console.log('password in onError: ', password);
+      console.log('email in onError: ', email);
+      setOnError(error.message);
+    },
 
-    const response = await fetch('api/register', {
-      method: 'POST',
-      body: JSON.stringify({
-        username,
-        password,
-        email,
-      }),
-    });
-
-    const data = response.json();
-    console.log(
-      'handleRegister()/RegisterForm.tx -> data from response.json',
-      data,
-    );
-  }
+    onCompleted: () => {
+      // This might not be needed
+      console.log('onCompleted in registerHandler in RegisterForm');
+      console.log('username in onCompleted: ', username);
+      console.log('password in onCompleted: ', password);
+      console.log('email in onCompleted: ', email);
+      router.refresh();
+    },
+  });
   return (
-    <form
-      className="flex flex-col gap-2"
-      onSubmit={async (e) => await handleRegister(e)}
-    >
-      <label>
-        Username
-        <input
-          onChange={(e) => {
-            setUsername(e.currentTarget.value);
-          }}
-        />
-      </label>
+    <div>
+      <h1>Register</h1>
+      <div>
+        <label>
+          username
+          <input
+            value={username}
+            onChange={(event) => {
+              setUsername(event.currentTarget.value);
+            }}
+          />
+        </label>
 
-      <label>
-        Password
-        <input
-          type="password"
-          onChange={(e) => {
-            setPassword(e.currentTarget.value);
-          }}
-        />
-      </label>
+        <br />
 
-      <label>
-        Email
-        <input
-          type="email"
-          onChange={(e) => {
-            setEmail(e.currentTarget.value);
-          }}
-        />
-      </label>
+        <label>
+          password
+          <input
+            type="password"
+            value={password}
+            onChange={(event) => {
+              setPassword(event.currentTarget.value);
+            }}
+          />
+        </label>
 
-      <button>Register</button>
-    </form>
+        <br />
+
+        <label>
+          email
+          <input
+            value={email}
+            onChange={(event) => {
+              setEmail(event.currentTarget.value);
+            }}
+          />
+        </label>
+
+        <button
+          onClick={async () => {
+            await registerHandler();
+          }}
+        >
+          Register
+        </button>
+      </div>
+      <div className="error">{onError}</div>
+    </div>
   );
 }
