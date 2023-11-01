@@ -3,6 +3,7 @@ import { ApolloServer } from '@apollo/server';
 import { startServerAndCreateNextHandler } from '@as-integrations/next';
 import { makeExecutableSchema } from '@graphql-tools/schema';
 import { GraphQLError } from 'graphql';
+import { cookies } from 'next/headers';
 // import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 import {
@@ -10,19 +11,22 @@ import {
   deleteCategoryById,
   getCategories,
   getCategoryById,
+  updateCategoryById,
 } from '../../../database/categories';
 import { createRole, getRoles } from '../../../database/roles';
 import {
   createUser,
   deleteUserById,
   getUserById,
+  getUserByUsername,
   getUsers,
+  updateUserById,
 } from '../../../database/users';
-import { User } from '../../../migrations/00003-createTableUsers';
 import {
   CreateCategoryArgs,
   CreateRoleArgs,
   CreateUserArgs,
+  User,
 } from '../../../util/types';
 
 // export type GraphQlResponseBody =
@@ -44,10 +48,10 @@ import {
 //   city: string;
 //   country: string;
 //   email: string;
-//   password: string;
+//   password_hash: string;
 //   phone: string;
 //   image: string;
-//   // roleId
+//   roleId
 // };
 
 const typeDefs = gql`
@@ -77,10 +81,10 @@ const typeDefs = gql`
     # city: String
     # country: String
     email: String!
-    password: String!
+    passwordHash: String!
     # phone: String
     # image: String
-    roleId: Int!
+    roleId: Int
   }
 
   type Listing {
@@ -104,37 +108,31 @@ const typeDefs = gql`
     categories: [Category]
     category(id: ID!): Category
 
-    # loggedInUserByFirstName(firstName: String!): User
+    loggedInUserByUsername(username: String!): User
   }
 
   type Mutation {
     # Users
-    createUser(
-      username: String!
-      email: String!
-      password: String!
-      roleId: Int!
-    ): User!
-
+    ## Create
+    createUser(username: String!, email: String!, passwordHash: String!): User!
+    ## Delete
     deleteUserById(id: ID!): User!
 
     # Roles
+    ## Create
     createRole(name: String!): Role!
 
     # Categories
+    ## Create
     createCategory(name: String!, image: String): Category!
-
+    ## Update
+    updateCategoryById(id: ID!, name: String!, image: String!): Category
     ## Delete
-    deleteCategoryById(id: ID!): User!
+    deleteCategoryById(id: ID!): Category!
 
-    # updateUserById(
-    #   id: ID!
-    #   firstName: String!
-    #   type: String!
-    #   accessory: String
-    # ): User
-
-    # login(username: String!, password: String!): User
+    # Authentication
+    ## Login
+    login(username: String!, password_hash: String!): User
   }
 `;
 
@@ -159,38 +157,25 @@ const resolvers = {
     category: async (parent: null, args: { id: string }) => {
       return await getCategoryById(parseInt(args.id));
     },
-    // loggedInUserByFirstName: async (
-    //   parent: null,
-    //   args: { firstName: string },
-    // ) => {
-    //   return await getUserByFirstName(args.firstName);
-    // },
+
+    loggedInUserByUsername: async (
+      parent: null,
+      args: { username: string },
+    ) => {
+      return await getUserByUsername(args.username);
+    },
   },
 
   Mutation: {
     createUser: async (parent: null, args: CreateUserArgs) => {
-      if (
-        typeof args.username !== 'string' ||
-        typeof args.email !== 'string' ||
-        typeof args.password !== 'string' ||
-        typeof args.roleId !== 'number' ||
-        // (args.username && typeof args.username !== 'string') ||
-        // (args.email && typeof args.email !== 'string') ||
-        // (args.password && typeof args.password !== 'string') ||
-        // (args.roleId && typeof args.roleId !== 'string') ||
-        !args.username ||
-        !args.email ||
-        !args.password ||
-        !args.roleId
-      ) {
+      if (typeof args.username !== 'string' || !args.username) {
         throw new GraphQLError('Required field is missing');
+      } else if (typeof args.email !== 'string' || !args.email) {
+        throw new GraphQLError('Required field email is missing');
+      } else if (typeof args.passwordHash !== 'string' || !args.passwordHash) {
+        throw new GraphQLError('Required field passwordHash is missing');
       }
-      return await createUser(
-        args.username,
-        args.email,
-        args.password,
-        args.roleId,
-      );
+      return await createUser(args.username, args.email, args.passwordHash);
     },
 
     deleteUserById: async (
@@ -206,67 +191,76 @@ const resolvers = {
 
     createRole: async (parent: null, args: CreateRoleArgs) => {
       if (typeof args.name !== 'string' || !args.name) {
-        throw new GraphQLError('Required field is missing');
+        throw new GraphQLError('Required field "name" is missing');
       }
       return await createRole(args.name);
     },
 
     createCategory: async (parent: null, args: CreateCategoryArgs) => {
-      if (
-        typeof args.name !== 'string' ||
-        typeof args.image !== 'string' ||
-        !args.name ||
-        !args.image
-      ) {
-        throw new GraphQLError('Required field is missing');
+      if (typeof args.name !== 'string' || !args.name) {
+        throw new GraphQLError('Required field "name" is missing');
+      } else if (typeof args.image !== 'string' || !args.image) {
+        throw new GraphQLError('Required field "image" is missing');
       }
       return await createCategory(args.name, args.image);
+    },
+
+    updateCategoryById: async (
+      parent: null,
+      args: { id: string; name: string; image: string },
+      // context: FakeAdminUserContext,
+    ) => {
+      // if (!context.isAdmin) {
+      //   throw new GraphQLError('Unauthorized operation');
+      // }
+      return await updateCategoryById(parseInt(args.id), args.name, args.image);
     },
 
     deleteCategoryById: async (parent: null, args: { id: string }) => {
       return await deleteCategoryById(parseInt(args.id));
     },
+
+    login: async (
+      parent: null,
+      args: { username: string; password_hash: string },
+    ) => {
+      console.log('inside login mutation.');
+      if (typeof args.username !== 'string' || !args.username) {
+        throw new GraphQLError('Required field username missing');
+      } else if (
+        typeof args.password_hash !== 'string' ||
+        !args.password_hash
+      ) {
+        throw new GraphQLError('Required field password_hash missing');
+      }
+
+      if (args.username !== 'lucifer' || args.password_hash !== 'asdf') {
+        throw new GraphQLError('Invalid username or password_hash');
+      }
+
+      console.log('setting cookie fakeSession with username: ', args.username);
+      cookies().set('fakeSession', args.username, {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        maxAge: 60 * 60 * 24 * 30, // 30 days
+      });
+
+      return await getUserByFirstName(args.username);
+    },
+
     //     updateUserById: async (parent: null, args: UserInput & { id: string }) => {
     //       if (
     //         typeof args.email !== 'string' ||
-    //         typeof args.password !== 'string' ||
+    //         typeof args.password_hash !== 'string' ||
     //         (args.email && typeof args.email !== 'string') ||
     //         !args.email ||
-    //         !args.password
+    //         !args.password_hash
     //       ) {
     //         throw new GraphQLError('Required field missing');
     //       }
-    //       return await updateUserById(parseInt(args.id), args.email, args.password);
+    //       return await updateUserById(parseInt(args.id), args.email, args.password_hash);
     //     },
-
-    //     login: async (
-    //       parent: null,
-    //       args: { username: string; password: string },
-    //     ) => {
-    //       //  FIXME: Implement secure authentication
-    //       if (
-    //         typeof args.username !== 'string' ||
-    //         typeof args.password !== 'string' ||
-    //         !args.username ||
-    //         !args.password
-    //       ) {
-    //         throw new GraphQLError('Required field missing');
-    //       }
-
-    //       if (args.username !== 'lucia' || args.password !== 'asdf') {
-    //         throw new GraphQLError('Invalid username or password');
-    //       }
-
-    //       cookies().set('fakeSession', args.username, {
-    //         httpOnly: true,
-    //         sameSite: 'lax',
-    //         path: '/',
-    //         maxAge: 60 * 60 * 24 * 30, // 30 days
-    //       });
-
-    //       return await getUserByFirstName(args.username);
-    //     },
-    //   },
   },
 };
 

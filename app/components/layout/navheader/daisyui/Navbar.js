@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import React from 'react';
+import { LogoutButton } from '../../../../(auth)/logout/LogoutButton';
 
 export default function Navbar() {
   return (
@@ -17,8 +18,17 @@ export default function Navbar() {
             </Link>
           </li>
           <li>
-            <Link href="/login">Login</Link>
+            <Link href="/categories">Categories</Link>
           </li>
+          {true ? (
+            <li>
+              <LogoutButton />
+            </li>
+          ) : (
+            <li>
+              <Link href="/login">Login</Link>
+            </li>
+          )}
           <li className="pr-5">
             <Link href="/register">Register</Link>
           </li>
