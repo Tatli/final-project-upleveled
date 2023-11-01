@@ -115,7 +115,7 @@ export default function AdminDashboard() {
         Category Name
         <input
           value={name}
-          className="input input-bordered"
+          className="input rounded-full bg-neutral-50	text-slate-700"
           onChange={(event) => {
             setName(event.currentTarget.value);
           }}
@@ -126,7 +126,7 @@ export default function AdminDashboard() {
         Image
         <input
           value={image}
-          className="input input-bordered"
+          className="input rounded-full bg-neutral-50	text-slate-700"
           onChange={(event) => {
             setImage(event.currentTarget.value);
           }}
@@ -134,7 +134,7 @@ export default function AdminDashboard() {
       </label>
       <br />
       <button
-        className="btn btn-primary"
+        className="btn btn-neutral"
         onClick={async () => await handleCreateCategory()}
       >
         Create Category
@@ -182,7 +182,7 @@ export default function AdminDashboard() {
             )}
 
             <button
-              className="btn py-2 px-4 border border-gray-400 border-b-4rounded shadow"
+              className="btn btn-outline"
               onClick={async () => {
                 await handleDeleteCategory({
                   variables: {
@@ -206,6 +206,7 @@ export default function AdminDashboard() {
               </button>
             ) : (
               <button
+                className="btn btn-outline"
                 onClick={() => {
                   setOnEditId(category.id);
                   setNameOnEditInput(category.name);

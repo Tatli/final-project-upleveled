@@ -5,16 +5,15 @@ export default function Home() {
     <main>
       <section className="mx-0 sm:mx-0 lg:mx-0 2xl:mx-0">
         <div
-          style={{
-            backgroundColor: 'red',
-            height: '408px',
-            minHeight: '480px',
-            maxHeight: '480px',
-            overflow: 'hidden',
-          }}
+          className="bg-primary text-white overflow-hidden h-96 min-h-96 max-h-96"
+          // style={{
+          //   height: '408px',
+          //   minHeight: '480px',
+          //   maxHeight: '480px',
+          // }}
         >
           <div className={`[url('/public/images/home/hero/hero_cropped.jpg')]`}>
-            dsf
+            div containing image url
           </div>
           {/* <img
             src="images/home/hero/hero_cropped.jpg"

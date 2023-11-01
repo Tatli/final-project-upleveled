@@ -29,10 +29,10 @@ export default async function CategoryPage(props: Props) {
 
   return (
     <div>
-      <h1 className={`text-5xl`}>Category info:</h1>
+      <h1 className={`text-3xl`}>Category info:</h1>
       <br />
-      <h2 className={`text-3xl`}>{data.category.name}</h2>
-      <p>Category ID: {data.category.id}</p>
+      <p className="badge badge-outline">Category ID: {data.category.id}</p>
+      <h2 className={`text-2xl`}>Category name: {data.category.name}</h2>
       <p>Image URL: {data.category.image}</p>
       {/* <Image
         src={data.category.image}

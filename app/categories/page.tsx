@@ -26,29 +26,36 @@ export default async function CategoriesPage() {
 
   return (
     <div>
-      <h1>These are the categories</h1>
-      <Link href="/categories/admin">Manage Categories</Link>
+      <Link className="badge badge-primary" href="/categories/admin">
+        Manage Categories
+      </Link>
 
-      {data.categories.map((category) => {
-        return (
-          <div
-            key={`category-div-${category.id}`}
-            data-test-id={`category-type-${category.id}`}
-          >
-            <Link href={`/categories/${category.id}`}>
-              <div>
-                {category.name} <span>URL: {category.image}</span>
-              </div>
-              {/* <Image
+      <br />
+      <br />
+
+      <h1 className="text-2xl">Available categories</h1>
+
+      <div className="gap-4">
+        {data.categories.map((category) => {
+          return (
+            <div
+              key={`category-div-${category.id}`}
+              data-test-id={`category-type-${category.id}`}
+            >
+              <Link href={`/categories/${category.id}`}>
+                <p className="badge badge-outline">{category.name}</p>{' '}
+                <p className="badge badge-accent"> {category.image}</p>
+                {/* <Image
                 src={`${category.image}`} // To-add
                 alt={category.name}
                 width={200}
                 height={200}
               /> */}
-            </Link>
-          </div>
-        );
-      })}
+              </Link>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
