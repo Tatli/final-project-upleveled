@@ -1,6 +1,10 @@
 import { cache } from 'react';
-import { User } from '../migrations/00003-createTableUsers';
+import { User } from '../util/types';
 import { sql } from './connect';
+
+export type UserWithPasswordHash = User & {
+  passwordHash: string;
+};
 
 export const getUsers = cache(async () => {
   const users = await sql<User[]>`
@@ -22,12 +26,12 @@ export const getUserById = cache(async (id: number) => {
 });
 
 export const createUser = cache(
-  async (username: string, email: string, password: string, roleId: number) => {
+  async (username: string, email: string, password_hash: string) => {
     const [user] = await sql<User[]>`
       INSERT INTO users
-        (username, email, password, role_id)
+        (username, email, password_hash)
       VALUES
-        (${username}, ${email}, ${password}, ${roleId})
+        (${username}, ${email}, ${password_hash})
       RETURNING *
     `;
 
@@ -62,8 +66,8 @@ export const deleteUserById = cache(async (id: number) => {
   return user;
 });
 
-export const getUserByFirstName = cache(async (firstName: string) => {
-  if (!firstName) {
+export const getUserByUsername = cache(async (username: string) => {
+  if (!username) {
     return undefined;
   }
 
@@ -73,7 +77,7 @@ export const getUserByFirstName = cache(async (firstName: string) => {
       FROM
         users
       WHERE
-        first_name = ${firstName}
+      username = ${username}
   `;
   return user;
 });

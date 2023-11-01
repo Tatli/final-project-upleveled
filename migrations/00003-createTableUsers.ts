@@ -1,28 +1,12 @@
 import { Sql } from 'postgres';
-
-export type User = {
-  id: number;
-  username: string;
-  firstName: string | null;
-  lastName: string | null;
-  birth_date: Date | null;
-  address: string | null;
-  postalCode: string | null;
-  city: string | null;
-  country: string | null;
-  email: string;
-  password: string;
-  phone: string | null;
-  image: string | null;
-  roleId: number;
-};
+import { User } from '../util/types';
 
 export async function up(sql: Sql) {
   await sql`
 
 CREATE TABLE users (
     id integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    username VARCHAR(150) ,
+    username VARCHAR(150) NOT NULL UNIQUE ,
     first_name VARCHAR(150) ,
     last_name VARCHAR(150) ,
     birth_date DATE ,
@@ -31,7 +15,7 @@ CREATE TABLE users (
     city VARCHAR(150) ,
     country VARCHAR(150) ,
     email VARCHAR(255) NOT NULL,
-    password VARCHAR(50) NOT NULL,
+    password_hash VARCHAR(50) NOT NULL,
     phone VARCHAR(30) ,
     image VARCHAR(255) ,
     role_id integer REFERENCES roles(id)

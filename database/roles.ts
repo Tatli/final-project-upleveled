@@ -1,5 +1,5 @@
 import { cache } from 'react';
-import { Role } from '../migrations/00000-createTableProfileType';
+import { Role } from '../migrations/00000-createTableRoles';
 import { sql } from './connect';
 
 export const getRoles = cache(async () => {

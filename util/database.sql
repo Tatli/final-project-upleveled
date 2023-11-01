@@ -23,7 +23,7 @@ CREATE TABLE users (
     city VARCHAR(150) ,
     country VARCHAR(150) ,
     email VARCHAR(255) NOT NULL,
-    password VARCHAR(50) NOT NULL,
+    password_hash VARCHAR(50) NOT NULL,
     phone VARCHAR(30) ,
     image VARCHAR(255) ,
     role_id integer REFERENCES profile_type(id)
