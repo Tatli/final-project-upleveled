@@ -26,7 +26,8 @@ export default async function CategoriesPage() {
 
   return (
     <div>
-      <h1>These are my categories</h1>
+      <h1>These are the categories</h1>
+      <Link href="/categories/admin">Manage Categories</Link>
 
       {data.categories.map((category) => {
         return (

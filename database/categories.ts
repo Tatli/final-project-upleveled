@@ -33,19 +33,22 @@ export const getCategoryById = cache(async (id: number) => {
   return category;
 });
 
-export const updateCategoryById = cache(async (id: number, name: string) => {
-  const [category] = await sql<Category[]>`
+export const updateCategoryById = cache(
+  async (id: number, name: string, image: string) => {
+    const [category] = await sql<Category[]>`
       UPDATE categories
       SET
        name = ${name},
+       image = ${image}
         -- Add fields
       WHERE
         id = ${id}
         RETURNING *
     `;
 
-  return category;
-});
+    return category;
+  },
+);
 
 export const deleteCategoryById = cache(async (id: number) => {
   const [category] = await sql<Category[]>`
