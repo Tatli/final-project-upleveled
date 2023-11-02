@@ -74,6 +74,8 @@ const typeDefs = gql`
   type User {
     id: ID!
     username: String!
+    email: String!
+    passwordHash: String!
     # firstName: String
     # lastName: String
     # birth_date: Date
@@ -81,8 +83,6 @@ const typeDefs = gql`
     # postalCode: String
     # city: String
     # country: String
-    email: String!
-    passwordHash: String!
     # phone: String
     # image: String
     roleId: Int
@@ -235,7 +235,9 @@ const resolvers = {
       parent: null,
       args: { username: string; password_hash: string },
     ) => {
-      console.log('inside login mutation.');
+      console.log('Inside login mutation.');
+
+      // Check if both credentials are filled in
       if (typeof args.username !== 'string' || !args.username) {
         throw new GraphQLError('Required field username missing');
       } else if (
@@ -245,11 +247,27 @@ const resolvers = {
         throw new GraphQLError('Required field password_hash missing');
       }
 
-      if (args.username !== 'lucifer' || args.password_hash !== 'asdf') {
-        throw new GraphQLError('Invalid username or password_hash');
+      // Validate that credentials exist in users table
+      // Get user by username from users table
+      const user = await getUserByUsername(args.username);
+      console.log('getUserByUsername inside login mutation:');
+      console.log('Single user from database: ', user);
+
+      console.log('args.username: ', args.username);
+      console.log('user.username: ', user?.username);
+      console.log('args.password: ', args.password_hash);
+      // Although it says that the object user doesn't contain "passwordHash" it does return the password
+      console.log('user.password: ', user?.passwordHash);
+
+      if (
+        args.username !== user?.username ||
+        args.password_hash !== user.passwordHash
+      ) {
+        throw new GraphQLError('Invalid username or password');
       }
 
       console.log('setting cookie fakeSession with username: ', args.username);
+      // Set Session cookie
       cookies().set('fakeSession', args.username, {
         httpOnly: true,
         sameSite: 'lax',
