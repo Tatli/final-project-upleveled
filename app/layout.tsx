@@ -21,6 +21,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const fakeSessionToken = cookies().get('fakeSession');
+
   const { data } = await getClient().query({
     query: gql`
       query LoggedInUser($username: String!) {
@@ -34,8 +35,9 @@ export default async function RootLayout({
       username: fakeSessionToken?.value || '',
     },
   });
+
   return (
-    <html lang="en">
+    <html lang="en" data-theme="corporate">
       <body className={inter.className}>
         <nav>
           <div className="navbar bg-base-100">
