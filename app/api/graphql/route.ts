@@ -280,7 +280,7 @@ const resolvers = {
       //   maxAge: 60 * 60 * 24 * 30, // 30 days
       // });
 
-      return await getUserByUsername(args.username);
+      return await createUser(args.username, args.email, args.password_hash);
     },
 
     //     updateUserById: async (parent: null, args: UserInput & { id: string }) => {
