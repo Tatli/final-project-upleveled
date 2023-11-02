@@ -90,12 +90,12 @@ export default function RegisterForm() {
           Register
         </button>
       </div>
-      <div className="error">{onError}</div>
+
       {onError ===
       'duplicate key value violates unique constraint "users_username_key"' ? (
         <div>Username already taken</div>
       ) : (
-        false
+        <div className="error">{onError}</div>
       )}
     </div>
   );

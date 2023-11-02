@@ -250,7 +250,7 @@ const resolvers = {
       // Validate that credentials exist in users table
       // Get user by username from users table
       const user = await getUserByUsername(args.username);
-      console.log('getUserByUsername inside login mutation:');
+      console.log('getUserByUsername in login mutation:');
       console.log('Single user from database: ', user);
 
       console.log('args.username: ', args.username);
@@ -282,23 +282,48 @@ const resolvers = {
       parent: null,
       args: { username: string; password_hash: string; email: string },
     ) => {
+      // Indicate "location"
       console.log('Inside register mutation');
-      console.log('username inside register mutation: ', args.username);
-      console.log(
-        'password_hash inside register mutation: ',
-        args.password_hash,
-      );
-      console.log('email inside register mutation: ', args.email);
 
-      // console.log('setting cookie fakeSession with username: ', args.username);
-      // cookies().set('fakeSession', args.username, {
-      //   httpOnly: true,
-      //   sameSite: 'lax',
-      //   path: '/',
-      //   maxAge: 60 * 60 * 24 * 30, // 30 days
-      // });
+      // Check if credentials are filled in
+      if (typeof args.username !== 'string' || !args.username) {
+        throw new GraphQLError('Required field username missing');
+      } else if (
+        typeof args.password_hash !== 'string' ||
+        !args.password_hash
+      ) {
+        throw new GraphQLError('Required field password_hash missing');
+      } else if (typeof args.email !== 'string' || !args.email) {
+        throw new GraphQLError('Required field email missing');
+      }
 
-      return await createUser(args.username, args.email, args.password_hash);
+      // Display argument values
+      console.log('username in register mutation: ', args.username);
+      console.log('password_hash in register mutation: ', args.password_hash);
+      console.log('email in register mutation: ', args.email);
+
+      const user = await getUserByUsername(args.username);
+
+      // Check if user with given username already exists
+      if (args.username !== user?.username) {
+        // Create user
+        await createUser(args.username, args.email, args.password_hash);
+        // Set session cookie
+        console.log(
+          'Setting cookie fakeSession with username: ',
+          args.username,
+        );
+        cookies().set('fakeSession', args.username, {
+          httpOnly: true,
+          sameSite: 'lax',
+          path: '/',
+          maxAge: 60 * 60 * 24 * 30, // 30 days
+        });
+      } else {
+        throw new GraphQLError('User already exists');
+      }
+
+      return await getUserByUsername(args.username);
     },
 
     //     updateUserById: async (parent: null, args: UserInput & { id: string }) => {
