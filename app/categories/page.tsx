@@ -26,7 +26,7 @@ export default async function CategoriesPage() {
 
   return (
     <div>
-      <Link className="badge badge-primary" href="/categories/admin">
+      <Link className="btn btn-info" href="/categories/admin">
         Manage Categories
       </Link>
 
