@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function Offer() {
+export default function Listing() {
   return (
     // <div className="card w-48 glass">
     //   <figure>
