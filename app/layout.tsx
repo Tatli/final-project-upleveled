@@ -43,14 +43,14 @@ export default async function RootLayout({
           <div className="navbar bg-base-100">
             <div className="flex-1">
               <Link className="btn btn-ghost normal-case text-xl" href="/">
-                Secondhand
+                Firsthand
               </Link>
             </div>
             <div className="flex-none">
               <ul className="menu menu-horizontal px-1">
                 <li>
-                  <Link href="/#">
-                    <div className="badge badge-accent text-white p-2">
+                  <Link href="/newlisting">
+                    <div className="badge badge-primary text-white p-2">
                       Create new listing
                     </div>
                   </Link>
@@ -63,13 +63,15 @@ export default async function RootLayout({
                     <LogoutButton />
                   </li>
                 ) : (
-                  <li>
-                    <Link href="/login">Login</Link>
-                  </li>
+                  <>
+                    <li>
+                      <Link href="/login">Login</Link>
+                    </li>
+                    <li className="pr-5">
+                      <Link href="/register">Register</Link>
+                    </li>
+                  </>
                 )}
-                <li className="pr-5">
-                  <Link href="/register">Register</Link>
-                </li>
 
                 {data.loggedInUserByUsername?.username ? (
                   <li>
@@ -82,7 +84,7 @@ export default async function RootLayout({
                           <Link href="/settings">View Profile</Link>
                         </li>
                         <li>
-                          <Link href="/offers">Offers</Link>
+                          <Link href="/listings">Manage Listings</Link>
                         </li>
                       </ul>
                     </details>
@@ -94,7 +96,7 @@ export default async function RootLayout({
             </div>
           </div>
         </nav>
-        <div className=" mx-2 sm:mx-8 lg:mx-24 2xl:mx-40">
+        <div className="mx-2 sm:mx-8 lg:mx-24 2xl:mx-40">
           <ApolloClientProvider>{children}</ApolloClientProvider>
         </div>
       </body>
