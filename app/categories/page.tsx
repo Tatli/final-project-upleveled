@@ -1,6 +1,8 @@
 import { gql } from '@apollo/client';
+import { cookies } from 'next/headers';
 // import Image from 'next/image';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import { getClient } from '../../util/apolloClient';
 
 export type CategoryResponse = {
@@ -10,6 +12,11 @@ export type CategoryResponse = {
     image: string;
   }[];
 };
+
+// export type LoggedInUserResponse = {
+//   id: number;
+//   username: string;
+// };
 
 export default async function CategoriesPage() {
   const { data } = await getClient().query<CategoryResponse>({
@@ -23,6 +30,26 @@ export default async function CategoriesPage() {
       }
     `,
   });
+
+  // const fakeSessionToken = cookies().get('fakeSession');
+
+  // const { user } = await getClient().query<LoggedInUserResponse>({
+  //   query: gql`
+  //     query LoggedInUser($username: String!) {
+  //       loggedInUserByUsername(username: $username) {
+  //         id
+  //         username
+  //       }
+  //     }
+  //   `,
+  //   variables: {
+  //     username: fakeSessionToken?.value || '',
+  //   },
+  // });
+
+  // if (!user.loggedInUserByUsername) {
+  //   redirect('/login');
+  // }
 
   return (
     <div>
