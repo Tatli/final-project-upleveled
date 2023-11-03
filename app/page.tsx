@@ -12,7 +12,10 @@ export default function Home() {
           //   maxHeight: '480px',
           // }}
         >
-          <div className={`[url('/public/images/home/hero/hero_cropped.jpg')]`}>
+          <div
+          // className="bg-gradient-to-r from-cyan-500 to-blue-500"
+          // className={`[url('/public/images/home/hero/hero_cropped.jpg')]`}
+          >
             div containing image url
           </div>
           {/* <img
