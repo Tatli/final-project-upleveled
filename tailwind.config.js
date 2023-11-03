@@ -46,7 +46,13 @@ module.exports = {
   plugins: [require('daisyui')],
   daisyui: {
     themes: [
-      'corporate',
+      {
+        corporate: {
+          ...require('daisyui/src/theming/themes')['[data-theme=corporate]'],
+          primary: '#67cba0',
+          'primary-focus': '#5CB690',
+        },
+      },
 
       // {
       //   mytheme: {
