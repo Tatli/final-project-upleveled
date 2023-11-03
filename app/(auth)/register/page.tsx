@@ -9,9 +9,5 @@ export default function Register() {
     console.log('Session token found. Redirecting to home path "/" ');
     redirect('/');
   }
-  return (
-    <div className="flex justify-center items-center">
-      <RegisterForm />
-    </div>
-  );
+  return <RegisterForm />;
 }
