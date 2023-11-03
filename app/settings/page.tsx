@@ -1,6 +1,30 @@
+import { gql } from '@apollo/client';
+import { cookies } from 'next/headers';
 import Image from 'next/image';
+import { redirect } from 'next/navigation';
+import { getClient } from '../../util/apolloClient';
 
-export default function Settings() {
+export default async function Settings() {
+  const fakeSessionToken = cookies().get('fakeSession');
+
+  const { data } = await getClient().query({
+    query: gql`
+      query LoggedInUser($username: String!) {
+        loggedInUserByUsername(username: $username) {
+          id
+          username
+        }
+      }
+    `,
+    variables: {
+      username: fakeSessionToken?.value || '',
+    },
+  });
+
+  if (!data.loggedInUserByUsername) {
+    redirect('/login');
+  }
+
   return (
     <div className={`grid grid-cols-12 pt-16`}>
       <div className={`col-span-2`}>
