@@ -1,6 +1,7 @@
 import { Sql } from 'postgres';
 
 export type Category = {
+  id: number;
   name: string;
   image: string;
 };
