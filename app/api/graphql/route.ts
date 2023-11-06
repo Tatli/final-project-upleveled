@@ -106,7 +106,7 @@ const typeDefs = gql`
     users: [User]
     user(id: ID!): User
     roles: [Role]
-    categories: [Category]
+    categories: [Category!]!
     category(id: ID!): Category
 
     loggedInUserByUsername(username: String!): User
