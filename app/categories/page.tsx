@@ -52,7 +52,7 @@ export default async function CategoriesPage() {
   // }
 
   return (
-    <div>
+    <section className="mx-2 sm:mx-8 lg:mx-24 2xl:mx-40">
       <Link className="btn btn-info" href="/categories/admin">
         Manage Categories
       </Link>
@@ -60,7 +60,7 @@ export default async function CategoriesPage() {
       <br />
       <br />
 
-      <h1 className="text-2xl">Available categories</h1>
+      <h1 className="text-2xl">Categories</h1>
 
       <div className="gap-4">
         {data.categories.map((category) => {
@@ -83,6 +83,6 @@ export default async function CategoriesPage() {
           );
         })}
       </div>
-    </div>
+    </section>
   );
 }

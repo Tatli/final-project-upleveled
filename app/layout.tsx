@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { getClient } from '../util/apolloClient';
 import { LogoutButton } from './(auth)/logout/LogoutButton';
 import { ApolloClientProvider } from './ApolloClientProvider';
+import Footer from './components/footer/daisyui/Footer';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -38,7 +39,9 @@ export default async function RootLayout({
 
   return (
     <html lang="en" data-theme="corporate">
-      <body className={inter.className}>
+      <body
+        className={`${inter.className} flex flex-col h-screen justify-between`}
+      >
         <nav>
           <div className="navbar bg-base-100">
             <div className="flex-1">
@@ -50,7 +53,7 @@ export default async function RootLayout({
               <ul className="menu menu-horizontal px-1">
                 <li>
                   <Link href="/newlisting">
-                    <div className="badge badge-primary text-white p-2">
+                    <div className="badge badge-primary text- text-white p-2">
                       Create new listing
                     </div>
                   </Link>
@@ -96,9 +99,9 @@ export default async function RootLayout({
             </div>
           </div>
         </nav>
-        <div className="mx-2 sm:mx-8 lg:mx-24 2xl:mx-40">
-          <ApolloClientProvider>{children}</ApolloClientProvider>
-        </div>
+        {/* <div className="mx-2 sm:mx-8 lg:mx-24 2xl:mx-40"> */}
+        <ApolloClientProvider>{children}</ApolloClientProvider>
+        <Footer />
       </body>
     </html>
   );
