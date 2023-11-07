@@ -76,15 +76,15 @@ const typeDefs = gql`
     username: String!
     email: String!
     passwordHash: String!
-    # firstName: String
-    # lastName: String
-    # birth_date: Date
-    # address: String
-    # postalCode: String
-    # city: String
-    # country: String
-    # phone: String
-    # image: String
+    firstName: String
+    lastName: String
+    birth_date: Date
+    address: String
+    postalCode: String
+    city: String
+    country: String
+    phone: String
+    image: String
     roleId: Int
   }
 
@@ -118,6 +118,8 @@ const typeDefs = gql`
     createUser(username: String!, email: String!, passwordHash: String!): User!
     ## Delete
     deleteUserById(id: ID!): User!
+    ## Update
+    updateUserById(id: ID): User!
 
     # Roles
     ## Create
@@ -191,6 +193,33 @@ const resolvers = {
       //   throw new GraphQLError('Unauthorized operation');
       // }
       return await deleteUserById(parseInt(args.id));
+    },
+
+    updateUserById: async (
+      parent: null,
+      args: {
+        id: string;
+        firstName: string;
+        lastName: string;
+        birthDate: Date;
+        address: string;
+        postalCode: string;
+        city: string;
+        country: string;
+        phone: string;
+      },
+    ) => {
+      return await updateUserById(
+        parseInt(args.id),
+        args.firstName,
+        args.lastName,
+        args.birthDate,
+        args.address,
+        args.postalCode,
+        args.city,
+        args.country,
+        args.phone,
+      );
     },
 
     createRole: async (parent: null, args: CreateRoleArgs) => {

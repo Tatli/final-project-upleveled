@@ -5,14 +5,6 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { getClient } from '../../util/apolloClient';
 
-export type CategoryResponse = {
-  categories: {
-    id: number;
-    name: string;
-    image: string;
-  }[];
-};
-
 // export type LoggedInUserResponse = {
 //   id: number;
 //   username: string;
