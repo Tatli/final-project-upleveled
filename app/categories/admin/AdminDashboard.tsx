@@ -2,7 +2,7 @@
 import { gql, useMutation } from '@apollo/client';
 import { useSuspenseQuery } from '@apollo/experimental-nextjs-app-support/ssr';
 import { useState } from 'react';
-import { CategoryResponse } from '../page';
+import { CategoryResponse } from '../../../util/types';
 
 const createCategory = gql`
   mutation CreateCategory($name: String!, $image: String!) {

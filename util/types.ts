@@ -30,3 +30,11 @@ export type User = {
   image: string | null;
   roleId: number | null;
 };
+
+export type CategoryResponse = {
+  categories: {
+    id: number;
+    name: string;
+    image: string;
+  }[];
+};
