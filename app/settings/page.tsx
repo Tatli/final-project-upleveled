@@ -27,9 +27,9 @@ export default async function Settings() {
   }
 
   const user = data.loggedInUserByUsername;
-  console.log('data', data);
-  console.log('user.username', user.username);
-  console.log('data.loggedInUserByUsername', data.loggedInUserByUsername);
+  // console.log('data', data);
+  // console.log('user.username', user.username);
+  // console.log('data.loggedInUserByUsername', data.loggedInUserByUsername);
 
-  return <AdminDashboard />;
+  return <AdminDashboard userId={user.id} />;
 }

@@ -1,16 +1,55 @@
+'use client';
+import { gql, useMutation, useQuery } from '@apollo/client';
 import Image from 'next/image';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { User } from '../../util/types';
+import UserInfoEdit from './UserInfoEdit';
 
-export default function AdminDashboard() {
+const getUser = gql`
+  query User($userId: ID!) {
+    user(id: $userId) {
+      id
+      username
+      firstName
+      lastName
+      birthDate
+      address
+      postalCode
+      city
+      country
+      email
+      passwordHash
+      phone
+    }
+  }
+`;
+
+export default function AdminDashboard({ userId }: { userId: string }) {
+  console.log('userId inside AdminDashboard: ', userId);
+
+  const { data, loading, error } = useQuery(getUser, {
+    variables: { userId },
+  });
+
+  // useEffect(() => {
+
+  //   return () => {
+  //     console.log('Hooks have been set');
+  //   };
+  // }, []);
+
+  if (loading) return <div className="col-span-4">Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
+
+  const user: User = data.user;
+
   return (
     <section className="mx-2 sm:mx-8 lg:mx-24 2xl:mx-40">
       <div className="grid grid-cols-12 pt-16">
         <div className="col-span-1">
           <h1 className="text-3xl pb-4">Settings</h1>
-
           <hr />
           <br />
-
           <div className="text-primary">Profile</div>
         </div>
         <div className="col-span-1" />
@@ -19,103 +58,7 @@ export default function AdminDashboard() {
           <hr />
           <br />
           <h2 className="text-2xl pb-2">Personal Information</h2>
-          <div className="form-control w-full">
-            <label htmlFor="firstName" className="label">
-              <span className="label-text">First name</span>
-            </label>
-            <input
-              id="firstName"
-              placeholder="First name"
-              className="input input-bordered w-full mb-2"
-            />
-            <label htmlFor="lastName" className="label">
-              <span className="label-text">Last name</span>
-            </label>
-            <input
-              id="lastName"
-              placeholder="Last name"
-              className="input input-bordered w-full mb-2"
-            />
-            <label htmlFor="birthDate" className="label">
-              <span className="label-text">Birth date</span>
-            </label>
-            <input
-              id="birthDate"
-              type="date"
-              placeholder="Last name"
-              className="input input-bordered w-full mb-2"
-            />
-            {/* ### Address ### */}
-            <h2 className="text-2xl my-2">Address</h2>
-            <label htmlFor="street" className="label">
-              <span className="label-text">Street</span>
-            </label>
-            <input
-              id="street"
-              placeholder="Street"
-              className="input input-bordered w-full mb-2"
-            />
-            <label htmlFor="city" className="label">
-              <span className="label-text">City</span>
-            </label>
-            <input
-              id="city"
-              placeholder="City"
-              className="input input-bordered w-full mb-2"
-            />
-            <label htmlFor="country" className="label">
-              <span className="label-text">Country</span>
-            </label>
-            <input
-              id="country"
-              placeholder="Last name"
-              className="input input-bordered w-full mb-2"
-            />
-            <label htmlFor="postalCode" className="label">
-              <span className="label-text">Postal code</span>
-            </label>
-            <input
-              id="postalCode"
-              placeholder="Postal code"
-              className="input input-bordered w-full mb-2"
-            />
-            <h2 className="text-2xl my-2">Private information</h2>
-            <label htmlFor="email" className="label">
-              <span className="label-text">Email</span>
-            </label>
-            <div className="join">
-              <input
-                id="email"
-                type="email"
-                placeholder="your@email.xyz"
-                className="input input-bordered join-item w-full mb-2"
-              />
-              <button className="btn join-item rounded-r-full">Change</button>
-            </div>
-
-            <label htmlFor="password" className="label">
-              <span className="label-text">Password</span>
-            </label>
-            <div className="join">
-              <input
-                id="password"
-                type="password"
-                placeholder="password"
-                className="input input-bordered join-item w-full mb-2"
-              />
-              <button className="btn join-item rounded-r-full">Change</button>
-            </div>
-
-            <label htmlFor="phone" className="label">
-              <span className="label-text">Phone</span>
-            </label>
-            <input
-              id="phone"
-              placeholder="06XX 123 456 78"
-              className="input input-bordered w-full mb-2"
-            />
-            <button className="btn btn-primary my-4">Save</button>
-          </div>
+          <UserInfoEdit userId={userId} user={user} />
         </div>
 
         <div className="col-span-1" />
