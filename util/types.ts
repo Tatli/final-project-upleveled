@@ -16,16 +16,16 @@ export type CreateCategoryArgs = {
 
 export type User = {
   id: number;
-  username: string;
+  username: string | null;
   firstName: string | null;
   lastName: string | null;
-  birth_date: Date | null;
+  birthDate: Date | null;
   address: string | null;
   postalCode: string | null;
   city: string | null;
   country: string | null;
-  email: string;
-  password_hash: string;
+  email: string | null;
+  passwordHash: string;
   phone: string | null;
   image: string | null;
   roleId: number | null;
@@ -37,4 +37,21 @@ export type CategoryResponse = {
     name: string;
     image: string;
   }[];
+};
+
+export type UserResponse = {
+  user: {
+    id: number;
+    username: string;
+    firstName: string | null;
+    lastName: string | null;
+    birthDate: Date | null;
+    address: string | null;
+    postalCode: string | null;
+    city: string | null;
+    country: string | null;
+    email: string;
+    passwordHash: string;
+    phone: string | null;
+  };
 };

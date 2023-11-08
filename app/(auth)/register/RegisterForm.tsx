@@ -6,7 +6,7 @@ import { useState } from 'react';
 
 const registerMutation = gql`
   mutation Register($username: String!, $password: String!, $email: String!) {
-    register(username: $username, password_hash: $password, email: $email) {
+    register(username: $username, passwordHash: $password, email: $email) {
       id
       username
       email

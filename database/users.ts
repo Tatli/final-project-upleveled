@@ -42,6 +42,7 @@ export const createUser = cache(
 export const updateUserById = cache(
   async (
     id: number,
+    username: string,
     firstName: string,
     lastName: string,
     birthDate: Date,
@@ -49,6 +50,8 @@ export const updateUserById = cache(
     postalCode: string,
     city: string,
     country: string,
+    email: string,
+    passwordHash: string,
     phone: string,
     // Add profile image
     // Add roleId
@@ -56,13 +59,16 @@ export const updateUserById = cache(
     const [user] = await sql<User[]>`
       UPDATE users
       SET
+        username = ${username},
         first_name = ${firstName},
         last_name = ${lastName},
         birth_date = ${birthDate},
         address = ${address},
-        postalCode = ${postalCode},
+        postal_code = ${postalCode},
         city = ${city},
         country = ${country},
+        email = ${email},
+        password_hash = ${passwordHash},
         phone = ${phone}
       WHERE
         id = ${id}

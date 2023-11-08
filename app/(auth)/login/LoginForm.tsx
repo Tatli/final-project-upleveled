@@ -6,7 +6,7 @@ import { useState } from 'react';
 
 const loginMutation = gql`
   mutation Login($username: String!, $password: String!) {
-    login(username: $username, password_hash: $password) {
+    login(username: $username, passwordHash: $password) {
       id
       username
       passwordHash

@@ -43,13 +43,13 @@ type FakeAdminUserContext = {
 // type UserInput = {
 //   firstName: string;
 //   lastName: string;
-//   birth_date: Date;
+//   birthDate: Date;
 //   address: string;
 //   postalCode: string;
 //   city: string;
 //   country: string;
 //   email: string;
-//   password_hash: string;
+//   passwordHash: string;
 //   phone: string;
 //   image: string;
 //   roleId
@@ -73,12 +73,12 @@ const typeDefs = gql`
   }
   type User {
     id: ID!
-    username: String!
-    email: String!
-    passwordHash: String!
+    username: String
+    email: String
+    passwordHash: String
     firstName: String
     lastName: String
-    birth_date: Date
+    birthDate: Date
     address: String
     postalCode: String
     city: String
@@ -119,7 +119,20 @@ const typeDefs = gql`
     ## Delete
     deleteUserById(id: ID!): User!
     ## Update
-    updateUserById(id: ID): User!
+    updateUserById(
+      id: ID!
+      username: String
+      firstName: String
+      lastName: String
+      birthDate: Date
+      address: String
+      postalCode: String
+      city: String
+      country: String
+      email: String
+      passwordHash: String
+      phone: String
+    ): User!
 
     # Roles
     ## Create
@@ -135,9 +148,9 @@ const typeDefs = gql`
 
     # Authentication
     ## Login
-    login(username: String!, password_hash: String!): User
+    login(username: String!, passwordHash: String!): User
     ## Register
-    register(username: String!, password_hash: String!, email: String!): User
+    register(username: String!, passwordHash: String!, email: String!): User
   }
 `;
 
@@ -199,6 +212,7 @@ const resolvers = {
       parent: null,
       args: {
         id: string;
+        username: string;
         firstName: string;
         lastName: string;
         birthDate: Date;
@@ -206,11 +220,14 @@ const resolvers = {
         postalCode: string;
         city: string;
         country: string;
+        email: string;
+        passwordHash: string;
         phone: string;
       },
     ) => {
       return await updateUserById(
         parseInt(args.id),
+        args.username,
         args.firstName,
         args.lastName,
         args.birthDate,
@@ -218,6 +235,8 @@ const resolvers = {
         args.postalCode,
         args.city,
         args.country,
+        args.email,
+        args.passwordHash,
         args.phone,
       );
     },
@@ -262,18 +281,15 @@ const resolvers = {
 
     login: async (
       parent: null,
-      args: { username: string; password_hash: string },
+      args: { username: string; passwordHash: string },
     ) => {
       console.log('Inside login mutation.');
 
       // Check if both credentials are filled in
       if (typeof args.username !== 'string' || !args.username) {
         throw new GraphQLError('Required field username missing');
-      } else if (
-        typeof args.password_hash !== 'string' ||
-        !args.password_hash
-      ) {
-        throw new GraphQLError('Required field password_hash missing');
+      } else if (typeof args.passwordHash !== 'string' || !args.passwordHash) {
+        throw new GraphQLError('Required field passwordHash missing');
       }
 
       // Validate that credentials exist in users table
@@ -284,13 +300,13 @@ const resolvers = {
 
       console.log('args.username: ', args.username);
       console.log('user.username: ', user?.username);
-      console.log('args.password: ', args.password_hash);
+      console.log('args.password: ', args.passwordHash);
       // Although it says that the object user doesn't contain "passwordHash" it does return the password
       console.log('user.password: ', user?.passwordHash);
 
       if (
         args.username !== user?.username ||
-        args.password_hash !== user.passwordHash
+        args.passwordHash !== user.passwordHash
       ) {
         throw new GraphQLError('Invalid username or password');
       }
@@ -309,7 +325,7 @@ const resolvers = {
 
     register: async (
       parent: null,
-      args: { username: string; password_hash: string; email: string },
+      args: { username: string; passwordHash: string; email: string },
     ) => {
       // Indicate "location"
       console.log('Inside register mutation');
@@ -317,18 +333,15 @@ const resolvers = {
       // Check if credentials are filled in
       if (typeof args.username !== 'string' || !args.username) {
         throw new GraphQLError('Required field username missing');
-      } else if (
-        typeof args.password_hash !== 'string' ||
-        !args.password_hash
-      ) {
-        throw new GraphQLError('Required field password_hash missing');
+      } else if (typeof args.passwordHash !== 'string' || !args.passwordHash) {
+        throw new GraphQLError('Required field passwordHash missing');
       } else if (typeof args.email !== 'string' || !args.email) {
         throw new GraphQLError('Required field email missing');
       }
 
       // Display argument values
       console.log('username in register mutation: ', args.username);
-      console.log('password_hash in register mutation: ', args.password_hash);
+      console.log('passwordHash in register mutation: ', args.passwordHash);
       console.log('email in register mutation: ', args.email);
 
       const user = await getUserByUsername(args.username);
@@ -336,7 +349,7 @@ const resolvers = {
       // Check if user with given username already exists
       if (args.username !== user?.username) {
         // Create user
-        await createUser(args.username, args.email, args.password_hash);
+        await createUser(args.username, args.email, args.passwordHash);
         // Set session cookie
         console.log(
           'Setting cookie fakeSession with username: ',
@@ -358,14 +371,14 @@ const resolvers = {
     //     updateUserById: async (parent: null, args: UserInput & { id: string }) => {
     //       if (
     //         typeof args.email !== 'string' ||
-    //         typeof args.password_hash !== 'string' ||
+    //         typeof args.passwordHash !== 'string' ||
     //         (args.email && typeof args.email !== 'string') ||
     //         !args.email ||
-    //         !args.password_hash
+    //         !args.passwordHash
     //       ) {
     //         throw new GraphQLError('Required field missing');
     //       }
-    //       return await updateUserById(parseInt(args.id), args.email, args.password_hash);
+    //       return await updateUserById(parseInt(args.id), args.email, args.passwordHash);
     //     },
   },
 };
