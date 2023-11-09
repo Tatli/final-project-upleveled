@@ -53,5 +53,21 @@ export type UserResponse = {
     email: string;
     passwordHash: string;
     phone: string | null;
+    roleId: number | null;
   };
+};
+
+export type GraphQlResponseBody =
+  | {
+      user: User;
+    }
+  | Error;
+
+export type FakeAdminUserContext = {
+  isAdmin: boolean;
+};
+
+export type Role = {
+  id: number;
+  name: string;
 };
