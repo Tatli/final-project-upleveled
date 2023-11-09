@@ -27,9 +27,20 @@ export default async function Settings() {
   }
 
   const user = data.loggedInUserByUsername;
-  // console.log('data', data);
-  // console.log('user.username', user.username);
-  // console.log('data.loggedInUserByUsername', data.loggedInUserByUsername);
+
+  // const { roleData } = await getClient().query({
+  //   query: gql`
+  //     query role($id: ID!) {
+  //       role(id: $id) {
+  //         id
+  //         name
+  //       }
+  //     }
+  //   `,
+  //   variables: {
+  //     id: user.id || '',
+  //   },
+  // });
 
   return <AdminDashboard userId={user.id} />;
 }

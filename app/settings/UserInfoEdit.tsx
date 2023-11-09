@@ -1,46 +1,87 @@
-import { gql, useMutation } from '@apollo/client';
+import { gql, useMutation, useQuery } from '@apollo/client';
+import { useSuspenseQuery } from '@apollo/experimental-nextjs-app-support/ssr';
 import React, { useState } from 'react';
-import { User } from '../../util/types';
+import { Role, User } from '../../util/types';
 
-const updateUserById = gql`
-  mutation UpdateUserById(
-    $id: ID!
-    $usernameOnEditInput: String!
-    $imageOnEditInput: String!
-  ) {
-    updateCategoryById(
-      id: $id
-      name: $nameOnEditInput
-      image: $imageOnEditInput
-    ) {
+const getRoles = gql`
+  query GetRoles {
+    roles {
       id
       name
-      image
     }
   }
 `;
 
-export default function UserInfoEdit(
-  { userId }: { userId: string },
-  { user }: { user: User },
-) {
-  const [username, setUsername] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [birthDate, setBirthDate] = useState('');
-  const [address, setAddress] = useState('');
-  const [postalCode, setPostalCode] = useState('');
-  const [city, setCity] = useState('');
-  const [country, setCountry] = useState('');
-  const [email, setEmail] = useState('');
-  const [passwordHash, setPasswordHash] = useState('');
-  const [phone, setPhone] = useState('');
+const updateUserById = gql`
+  mutation UpdateUserById(
+    $id: ID!
+    $username: String
+    $firstName: String
+    $lastName: String
+    $birthDate: Date
+    $address: String
+    $postalCode: String
+    $city: String
+    $country: String
+    $email: String
+    $passwordHash: String
+    $phone: String
+    $roleId: Int
+  ) {
+    updateUserById(
+      id: $id
+      username: $username
+      firstName: $firstName
+      lastName: $lastName
+      birthDate: $birthDate
+      address: $address
+      postalCode: $postalCode
+      city: $city
+      country: $country
+      email: $email
+      passwordHash: $passwordHash
+      phone: $phone
+      roleId: $roleId
+    ) {
+      id
+      username
+      firstName
+      lastName
+      birthDate
+      address
+      postalCode
+      city
+      country
+      email
+      passwordHash
+      phone
+      roleId
+    }
+  }
+`;
+
+export default function UserInfoEdit({ user }: { user: User }) {
+  const [username, setUsername] = useState(user.username);
+  const [firstName, setFirstName] = useState(user.firstName);
+  const [lastName, setLastName] = useState(user.lastName);
+  const [birthDate, setBirthDate] = useState(user.birthDate);
+  const [address, setAddress] = useState(user.address);
+  const [city, setCity] = useState(user.city);
+  const [country, setCountry] = useState(user.country);
+  const [postalCode, setPostalCode] = useState(user.postalCode);
+  const [email, setEmail] = useState(user.email);
+  const [passwordHash, setPasswordHash] = useState(user.passwordHash);
+  const [phone, setPhone] = useState(user.phone);
+  const [profileType, setProfileType] = useState(user.roleId); // Add Profile Type from API
   const [onError, setOnError] = useState('');
   const [isEditing, setIsEditing] = useState(false);
 
+  const { data, refetch } = useSuspenseQuery<Role[]>(getRoles);
+  console.log('data from getRoles in UserInfoEdit', data);
+
   const [handleUpdateUser] = useMutation(updateUserById, {
     variables: {
-      id: userId,
+      id: user.id,
       username,
       firstName,
       lastName,
@@ -52,6 +93,7 @@ export default function UserInfoEdit(
       email,
       passwordHash,
       phone,
+      profileType,
     },
 
     onError: (error) => {
@@ -64,187 +106,358 @@ export default function UserInfoEdit(
       // await refetch();
     },
   });
+
   return (
-    <div className="form-control w-full">
-      {isEditing ? (
-        <>
-          <label htmlFor="username" className="label">
-            <span className="label-text">Username</span>
-          </label>
-          <input
-            id="userName"
-            value={username}
-            // placeholder="Username"
-            onChange={(e) => {
-              setUsername(e.currentTarget.value);
+    <div className="col-span-5">
+      <h1 className="text-3xl pb-4">Profile</h1>
+      <hr />
+      <br />
+
+      <div className="form-control w-full">
+        {isEditing ? (
+          <>
+            <h2 className="text-2xl ">User Information</h2>
+
+            <label htmlFor="username" className="label">
+              <span className="label-text">Username</span>
+            </label>
+            <input
+              id="username"
+              value={username}
+              onChange={(e) => {
+                setUsername(e.currentTarget.value);
+              }}
+              className="input input-bordered w-full mb-2"
+            />
+
+            <label htmlFor="password" className="label">
+              <span className="label-text">Password</span>
+            </label>
+            <input
+              value={passwordHash}
+              id="password"
+              placeholder="password"
+              className="input input-bordered join-item w-full mb-2"
+              onChange={(e) => {
+                setPasswordHash(e.currentTarget.value);
+              }}
+            />
+
+            <label htmlFor="profileType" className="label">
+              <span className="label-text">Profile type</span>
+            </label>
+            <select
+              id="profileType"
+              className="select select-bordered w-full mb-2"
+              value={profileType}
+              onChange={(e) => {
+                setProfileType(parseInt(e.currentTarget.value));
+                console.log('profileType set to: ', profileType);
+              }}
+            >
+              {data.map((role) => {
+                return (
+                  <option key={`role-id-${role.id}`} value={role.id}>
+                    {role.name}
+                  </option>
+                );
+              })}
+            </select>
+
+            {/* Personal Information */}
+            <h2 className="text-2xl mt-4">Personal Information</h2>
+            <label htmlFor="firstName" className="label">
+              <span className="label-text">First name</span>
+            </label>
+            <input
+              id="firstName"
+              value={firstName}
+              placeholder="First name"
+              onChange={(e) => {
+                setFirstName(e.currentTarget.value);
+              }}
+              className="input input-bordered w-full mb-2"
+            />
+
+            <label htmlFor="lastName" className="label">
+              <span className="label-text">Last name</span>
+            </label>
+            <input
+              id="lastName"
+              value={lastName}
+              placeholder="Last name"
+              onChange={(e) => {
+                setLastName(e.currentTarget.value);
+              }}
+              className="input input-bordered w-full mb-2"
+            />
+
+            <label htmlFor="birthDate" className="label">
+              <span className="label-text">Birth Date</span>
+            </label>
+            <input
+              id="birthDate"
+              value={birthDate}
+              type="date"
+              placeholder="Birth Date"
+              onChange={(e) => {
+                setBirthDate(e.currentTarget.value);
+              }}
+              className="input input-bordered w-full mb-2"
+            />
+            {/* Contact Information */}
+            <h2 className="text-2xl mt-4">Contact Information</h2>
+            <label htmlFor="email" className="label">
+              <span className="label-text">Email</span>
+            </label>
+            <input
+              id="email"
+              type="email"
+              value={email}
+              placeholder="your@email.xyz"
+              className="input input-bordered join-item w-full mb-2"
+              onChange={(e) => {
+                setEmail(e.currentTarget.value);
+              }}
+            />
+
+            <label htmlFor="phone" className="label">
+              <span className="label-text">Phone</span>
+            </label>
+            <input
+              value={phone}
+              id="phone"
+              placeholder="06XX 123 456 78"
+              className="input input-bordered w-full mb-2"
+              onChange={(e) => {
+                setPhone(e.currentTarget.value);
+              }}
+            />
+
+            {/* ### Address ### */}
+            <h2 className="text-2xl mt-4">Address</h2>
+            <label htmlFor="address" className="label">
+              <span className="label-text">Street</span>
+            </label>
+            <input
+              value={address}
+              id="address"
+              placeholder="Street Name 1/2"
+              className="input input-bordered w-full mb-2"
+              onChange={(e) => {
+                setAddress(e.currentTarget.value);
+              }}
+            />
+
+            <label htmlFor="city" className="label">
+              <span className="label-text">City</span>
+            </label>
+            <input
+              value={city}
+              id="city"
+              placeholder="City"
+              className="input input-bordered w-full mb-2"
+              onChange={(e) => {
+                setCity(e.currentTarget.value);
+              }}
+            />
+
+            <label htmlFor="country" className="label">
+              <span className="label-text">Country</span>
+            </label>
+            <input
+              value={country}
+              id="country"
+              placeholder="Last name"
+              className="input input-bordered w-full mb-2"
+              onChange={(e) => {
+                setCountry(e.currentTarget.value);
+              }}
+            />
+
+            <label htmlFor="postalCode" className="label">
+              <span className="label-text">Postal code</span>
+            </label>
+            <input
+              value={postalCode}
+              id="postalCode"
+              placeholder="Postal code"
+              className="input input-bordered w-full mb-2"
+              onChange={(e) => {
+                setPostalCode(e.currentTarget.value);
+              }}
+            />
+          </>
+        ) : (
+          <>
+            {/* User Information */}
+            <h2 className="text-2xl ">User Information</h2>
+            <label htmlFor="username" className="label">
+              <span className="label-text">Username</span>
+            </label>
+            <input
+              id="username"
+              value={username}
+              // placeholder="Username"
+              className="input input-bordered w-full mb-2"
+              disabled
+            />
+
+            <label htmlFor="password" className="label">
+              <span className="label-text">Password</span>
+            </label>
+            <input
+              id="password"
+              placeholder="password"
+              className="input input-bordered join-item w-full mb-2"
+              disabled
+            />
+
+            <label htmlFor="profileType" className="label">
+              <span className="label-text">Profile type</span>
+            </label>
+            <input
+              id="profileType"
+              value={profileType}
+              // placeholder="Username"
+              className="input input-bordered w-full mb-2"
+              disabled
+            />
+
+            {/* Personal Information */}
+            <h2 className="text-2xl mt-4">Personal Information</h2>
+
+            <label htmlFor="firstName" className="label">
+              <span className="label-text">First name</span>
+            </label>
+            <input
+              id="firstName"
+              value={firstName}
+              placeholder="First name"
+              className="input input-bordered w-full mb-2"
+              disabled
+            />
+
+            <label htmlFor="lastName" className="label">
+              <span className="label-text">Last name</span>
+            </label>
+            <input
+              id="lastName"
+              value={lastName}
+              placeholder="Last name"
+              className="input input-bordered w-full mb-2"
+              disabled
+            />
+
+            <label htmlFor="birthDate" className="label">
+              <span className="label-text">Birth Date</span>
+            </label>
+            <input
+              id="birthDate"
+              value={birthDate}
+              type="date"
+              placeholder="Last name"
+              className="input input-bordered w-full mb-2"
+              disabled
+            />
+
+            {/* Contact Information */}
+            <h2 className="text-2xl mt-4">Contact Information</h2>
+
+            <label htmlFor="email" className="label">
+              <span className="label-text">Email</span>
+            </label>
+            <input
+              id="email"
+              value={email}
+              placeholder="your@mail.xyz"
+              className="input input-bordered w-full mb-2"
+              disabled
+            />
+
+            <label htmlFor="phone" className="label">
+              <span className="label-text">Phone</span>
+            </label>
+            <input
+              id="birthDate"
+              value={phone}
+              placeholder="Phone number"
+              className="input input-bordered w-full mb-2"
+              disabled
+            />
+
+            {/* ### Address ### */}
+            <h2 className="text-2xl mt-4">Address</h2>
+
+            <label htmlFor="address" className="label">
+              <span className="label-text">Street</span>
+            </label>
+            <input
+              id="address"
+              value={address}
+              placeholder="Street Name 1/2"
+              className="input input-bordered w-full mb-2"
+              disabled
+            />
+
+            <label htmlFor="city" className="label">
+              <span className="label-text">City</span>
+            </label>
+            <input
+              id="city"
+              value={city}
+              placeholder="City"
+              className="input input-bordered w-full mb-2"
+              disabled
+            />
+            <label htmlFor="country" className="label">
+              <span className="label-text">Country</span>
+            </label>
+            <input
+              id="country"
+              value={country}
+              placeholder="Country"
+              className="input input-bordered w-full mb-2"
+              disabled
+            />
+            <label htmlFor="postalCode" className="label">
+              <span className="label-text">Postal code</span>
+            </label>
+            <input
+              id="postalCode"
+              value={postalCode}
+              placeholder="City"
+              className="input input-bordered w-full mb-2"
+              disabled
+            />
+          </>
+        )}
+
+        {isEditing ? (
+          <button
+            className="btn btn-outline btn-success mt-2"
+            onClick={async () => {
+              await setIsEditing(false);
+              await handleUpdateUser();
+              console.log('Running handleUpdateUser');
             }}
-            className="input input-bordered w-full mb-2"
-          />
-
-          <label htmlFor="firstName" className="label">
-            <span className="label-text">First name</span>
-          </label>
-          <input
-            id="firstName"
-            value={firstName}
-            placeholder="First name"
-            onChange={(e) => {
-              setFirstName(e.currentTarget.value);
+          >
+            Save
+          </button>
+        ) : (
+          <button
+            className="btn btn-outline mt-2"
+            onClick={() => {
+              setIsEditing(true);
             }}
-            className="input input-bordered w-full mb-2"
-          />
+          >
+            Edit
+          </button>
+        )}
+        <p className="text-error">{onError}</p>
 
-          <label htmlFor="lastName" className="label">
-            <span className="label-text">Last name</span>
-          </label>
-          <input
-            id="lastName"
-            value={lastName}
-            placeholder="Last name"
-            onChange={(e) => {
-              setLastName(e.currentTarget.value);
-            }}
-            className="input input-bordered w-full mb-2"
-          />
-
-          <label htmlFor="birthDate" className="label">
-            <span className="label-text">Birth date</span>
-          </label>
-          <input
-            id="birthDate"
-            value={birthDate}
-            type="date"
-            placeholder="Last name"
-            onChange={(e) => {
-              setBirthDate(e.currentTarget.value);
-            }}
-            className="input input-bordered w-full mb-2"
-          />
-        </>
-      ) : (
-        <>
-          <label htmlFor="username" className="label">
-            <span className="label-text">Username</span>
-          </label>
-          <span id="username" className="ml-2 label-text">
-            {data.user.username}
-          </span>
-
-          <label htmlFor="firstName" className="label">
-            <span className="label-text">First name</span>
-          </label>
-          <span id="firstName" className="ml-2 label-text">
-            {data.user.firstName}
-          </span>
-
-          <label htmlFor="lastName" className="label">
-            <span className="label-text">Last name</span>
-          </label>
-          <span id="lastName" className="ml-2 label-text">
-            {data.user.lastName}
-          </span>
-
-          <label htmlFor="birthDate" className="label">
-            <span className="label-text">Birth date</span>
-          </label>
-          <span id="birthDate" className="ml-2 label-text">
-            {data.user.birthDate}
-          </span>
-        </>
-      )}
-
-      {isEditing ? (
-        <button
-          className="btn btn-outline btn-success"
-          onClick={async () => {
-            await setIsEditing(false);
-            console.log(`Saving username. Value in input field: ${username}`);
-          }}
-        >
-          Save
-        </button>
-      ) : (
-        <button
-          className="btn btn-outline"
-          onClick={() => {
-            setIsEditing(true);
-          }}
-        >
-          Edit
-        </button>
-      )}
-
-      {/* ### Address ### */}
-      <h2 className="text-2xl my-2">Address</h2>
-      <label htmlFor="street" className="label">
-        <span className="label-text">Street</span>
-      </label>
-      <input
-        id="street"
-        placeholder="Street"
-        className="input input-bordered w-full mb-2"
-      />
-      <label htmlFor="city" className="label">
-        <span className="label-text">City</span>
-      </label>
-      <input
-        id="city"
-        placeholder="City"
-        className="input input-bordered w-full mb-2"
-      />
-      <label htmlFor="country" className="label">
-        <span className="label-text">Country</span>
-      </label>
-      <input
-        id="country"
-        placeholder="Last name"
-        className="input input-bordered w-full mb-2"
-      />
-      <label htmlFor="postalCode" className="label">
-        <span className="label-text">Postal code</span>
-      </label>
-      <input
-        id="postalCode"
-        placeholder="Postal code"
-        className="input input-bordered w-full mb-2"
-      />
-      <h2 className="text-2xl my-2">Private information</h2>
-      <label htmlFor="email" className="label">
-        <span className="label-text">Email</span>
-      </label>
-      <div className="join">
-        <input
-          id="email"
-          type="email"
-          value={email}
-          placeholder="your@email.xyz"
-          className="input input-bordered join-item w-full mb-2"
-        />
-        <button className="btn join-item rounded-r-full">Change</button>
+        {/* <button className="btn btn-primary my-4">Save</button> */}
       </div>
-
-      <label htmlFor="password" className="label">
-        <span className="label-text">Password</span>
-      </label>
-      <div className="join">
-        <input
-          id="password"
-          type="password"
-          placeholder="password"
-          className="input input-bordered join-item w-full mb-2"
-        />
-        <button className="btn join-item rounded-r-full">Change</button>
-      </div>
-
-      <label htmlFor="phone" className="label">
-        <span className="label-text">Phone</span>
-      </label>
-      <input
-        id="phone"
-        placeholder="06XX 123 456 78"
-        className="input input-bordered w-full mb-2"
-      />
-      <button className="btn btn-primary my-4">Save</button>
     </div>
   );
 }

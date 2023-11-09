@@ -1,7 +1,6 @@
 'use client';
-import { gql, useMutation, useQuery } from '@apollo/client';
+import { gql, useQuery } from '@apollo/client';
 import Image from 'next/image';
-import React, { useEffect, useState } from 'react';
 import { User } from '../../util/types';
 import UserInfoEdit from './UserInfoEdit';
 
@@ -20,6 +19,7 @@ const getUser = gql`
       email
       passwordHash
       phone
+      roleId
     }
   }
 `;
@@ -30,13 +30,6 @@ export default function AdminDashboard({ userId }: { userId: string }) {
   const { data, loading, error } = useQuery(getUser, {
     variables: { userId },
   });
-
-  // useEffect(() => {
-
-  //   return () => {
-  //     console.log('Hooks have been set');
-  //   };
-  // }, []);
 
   if (loading) return <div className="col-span-4">Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
@@ -53,54 +46,30 @@ export default function AdminDashboard({ userId }: { userId: string }) {
           <div className="text-primary">Profile</div>
         </div>
         <div className="col-span-1" />
-        <div className="col-span-5">
-          <h1 className="text-3xl pb-4">Profile</h1>
-          <hr />
-          <br />
-          <h2 className="text-2xl pb-2">Personal Information</h2>
-          <UserInfoEdit userId={userId} user={user} />
-        </div>
+
+        <UserInfoEdit user={user} />
 
         <div className="col-span-1" />
 
         <div className="col-span-4">
-          <div className="flex flex-col">
-            <h2 className="text-2xl mb-8">Profile picture</h2>
-            <Image
-              src="/images/profile/default-male.jpg"
-              width={285}
-              height={516}
-              alt="Picture of the user"
-            />
-            <input
-              type="file"
-              className="file-input file-input-bordered file-input-primary w-4/6 mt-2"
-            />
-            <h2 className="text-2xl my-4">Profile type</h2>
-
-            {/* Move this out into a client component for state management */}
-            <div className="form-control">
-              <div className="w-2/3">
-                <label className="label cursor-pointer">
-                  <span className="label-text">Private</span>
-                  <input
-                    type="radio"
-                    name="profileType"
-                    className="radio checked:bg-primary"
-                  />
-                </label>
-              </div>
-              <div className="w-2/3">
-                <label className="label cursor-pointer">
-                  <span className="label-text">Commercial</span>
-                  <input
-                    type="radio"
-                    name="profileType"
-                    className="radio checked:bg-primary"
-                  />
-                </label>
-              </div>
+          <h2 className="text-2xl mb-8">Profile picture</h2>
+          <div className="flex flex-col justify-center">
+            <div>
+              <Image
+                src="/images/profile/default-male.jpg"
+                width={200}
+                height={361}
+                alt="Picture of the user"
+              />
             </div>
+
+            <span className="label-text font-medium mb-1">Upload picture</span>
+
+            <input
+              id="image"
+              type="file"
+              className="file-input file-input-bordered file-input-sm w-4/6"
+            />
           </div>
         </div>
       </div>

@@ -13,7 +13,7 @@ import {
   getCategoryById,
   updateCategoryById,
 } from '../../../database/categories';
-import { createRole, getRoles } from '../../../database/roles';
+import { createRole, getRoleById, getRoles } from '../../../database/roles';
 import {
   createUser,
   deleteUserById,
@@ -27,41 +27,13 @@ import {
   CreateCategoryArgs,
   CreateRoleArgs,
   CreateUserArgs,
-  User,
+  FakeAdminUserContext,
+  GraphQlResponseBody,
 } from '../../../util/types';
-
-export type GraphQlResponseBody =
-  | {
-      user: User;
-    }
-  | Error;
-
-type FakeAdminUserContext = {
-  isAdmin: boolean;
-};
-
-// type UserInput = {
-//   firstName: string;
-//   lastName: string;
-//   birthDate: Date;
-//   address: string;
-//   postalCode: string;
-//   city: string;
-//   country: string;
-//   email: string;
-//   passwordHash: string;
-//   phone: string;
-//   image: string;
-//   roleId
-// };
 
 const typeDefs = gql`
   scalar Date
 
-  type Role {
-    id: ID!
-    name: String
-  }
   type Category {
     id: ID!
     name: String!
@@ -101,15 +73,21 @@ const typeDefs = gql`
     statusId: Int
     categoriesId: Int
   }
+  type Role {
+    id: ID!
+    name: String
+  }
 
   type Query {
-    users: [User]
     user(id: ID!): User
-    roles: [Role]
-    categories: [Category!]!
-    category(id: ID!): Category
-
+    users: [User]
     loggedInUserByUsername(username: String!): User
+
+    role(id: ID!): Role
+    roles: [Role]
+
+    category(id: ID!): Category
+    categories: [Category!]!
   }
 
   type Mutation {
@@ -132,6 +110,7 @@ const typeDefs = gql`
       email: String
       passwordHash: String
       phone: String
+      roleId: Int
     ): User!
 
     # Roles
@@ -156,24 +135,28 @@ const typeDefs = gql`
 
 const resolvers = {
   Query: {
+    user: async (parent: null, args: { id: string }) => {
+      return await getUserById(parseInt(args.id));
+    },
+
     users: async () => {
       return await getUsers();
     },
 
-    user: async (parent: null, args: { id: string }) => {
-      return await getUserById(parseInt(args.id));
+    role: async (parent: null, args: { id: string }) => {
+      return await getRoleById(parseInt(args.id));
     },
 
     roles: async () => {
       return await getRoles();
     },
 
-    categories: async () => {
-      return await getCategories();
-    },
-
     category: async (parent: null, args: { id: string }) => {
       return await getCategoryById(parseInt(args.id));
+    },
+
+    categories: async () => {
+      return await getCategories();
     },
 
     loggedInUserByUsername: async (
@@ -223,6 +206,7 @@ const resolvers = {
         email: string;
         passwordHash: string;
         phone: string;
+        roleId: number;
       },
     ) => {
       return await updateUserById(
@@ -238,6 +222,7 @@ const resolvers = {
         args.email,
         args.passwordHash,
         args.phone,
+        args.roleId,
       );
     },
 
@@ -283,8 +268,6 @@ const resolvers = {
       parent: null,
       args: { username: string; passwordHash: string },
     ) => {
-      console.log('Inside login mutation.');
-
       // Check if both credentials are filled in
       if (typeof args.username !== 'string' || !args.username) {
         throw new GraphQLError('Required field username missing');
@@ -292,18 +275,7 @@ const resolvers = {
         throw new GraphQLError('Required field passwordHash missing');
       }
 
-      // Validate that credentials exist in users table
-      // Get user by username from users table
       const user = await getUserByUsername(args.username);
-      console.log('getUserByUsername in login mutation:');
-      console.log('Single user from database: ', user);
-
-      console.log('args.username: ', args.username);
-      console.log('user.username: ', user?.username);
-      console.log('args.password: ', args.passwordHash);
-      // Although it says that the object user doesn't contain "passwordHash" it does return the password
-      console.log('user.password: ', user?.passwordHash);
-
       if (
         args.username !== user?.username ||
         args.passwordHash !== user.passwordHash
@@ -311,7 +283,6 @@ const resolvers = {
         throw new GraphQLError('Invalid username or password');
       }
 
-      console.log('setting cookie fakeSession with username: ', args.username);
       // Set Session cookie
       cookies().set('fakeSession', args.username, {
         httpOnly: true,
@@ -367,19 +338,6 @@ const resolvers = {
 
       return await getUserByUsername(args.username);
     },
-
-    //     updateUserById: async (parent: null, args: UserInput & { id: string }) => {
-    //       if (
-    //         typeof args.email !== 'string' ||
-    //         typeof args.passwordHash !== 'string' ||
-    //         (args.email && typeof args.email !== 'string') ||
-    //         !args.email ||
-    //         !args.passwordHash
-    //       ) {
-    //         throw new GraphQLError('Required field missing');
-    //       }
-    //       return await updateUserById(parseInt(args.id), args.email, args.passwordHash);
-    //     },
   },
 };
 

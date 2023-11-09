@@ -1,5 +1,5 @@
 import { cache } from 'react';
-import { Role } from '../migrations/00000-createTableRoles';
+import { Role } from '../util/types';
 import { sql } from './connect';
 
 export const getRoles = cache(async () => {
@@ -7,6 +7,19 @@ export const getRoles = cache(async () => {
     SELECT * FROM roles
  `;
   return roles;
+});
+
+export const getRoleById = cache(async (id: number) => {
+  const [role] = await sql<Role[]>`
+      SELECT
+      *
+    FROM
+      roles
+    WHERE
+      id = ${id}
+  `;
+
+  return role;
 });
 
 export const createRole = cache(async (name: string) => {
