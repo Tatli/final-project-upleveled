@@ -11,9 +11,9 @@ CREATE TABLE listings (
     views integer,
     created_at timestamp DEFAULT NOW(),
     updated_at timestamp DEFAULT NOW(),
-    user_id integer REFERENCES users(id),
-    status_id integer REFERENCES status(id),
-    categories_id integer REFERENCES categories(id)
+    user_id integer REFERENCES users(id) ON DELETE SET NULL,
+    category_id integer REFERENCES categories(id) ON DELETE SET NULL
+    status_id integer REFERENCES status(id) ON DELETE SET NULL,
 );
 `;
 }

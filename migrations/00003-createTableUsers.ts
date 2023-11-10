@@ -18,9 +18,8 @@ CREATE TABLE users (
     password_hash VARCHAR(50) NOT NULL,
     phone VARCHAR(30) ,
     image VARCHAR(255) ,
-    role_id integer REFERENCES roles(id)
+    role_id integer REFERENCES roles(id) ON DELETE SET NULL
 );
-
 `;
 }
 
