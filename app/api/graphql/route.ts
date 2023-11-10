@@ -13,6 +13,7 @@ import {
   getCategoryById,
   updateCategoryById,
 } from '../../../database/categories';
+import { createListing } from '../../../database/listings';
 import { createRole, getRoleById, getRoles } from '../../../database/roles';
 import {
   createUser,
@@ -29,6 +30,7 @@ import {
   CreateUserArgs,
   FakeAdminUserContext,
   GraphQlResponseBody,
+  Listing,
 } from '../../../util/types';
 
 const typeDefs = gql`
@@ -130,6 +132,19 @@ const typeDefs = gql`
     login(username: String!, passwordHash: String!): User
     ## Register
     register(username: String!, passwordHash: String!, email: String!): User
+
+    # Listing
+    ## Create
+    createListing(
+      title: String!
+      price: String!
+      description: String!
+      image: String
+      views: Int
+      userId: Int
+      category_Id: Int
+      statusId: Int
+    ): Listing!
   }
 `;
 
@@ -168,6 +183,9 @@ const resolvers = {
   },
 
   Mutation: {
+    // User
+
+    // // Create User
     createUser: async (parent: null, args: CreateUserArgs) => {
       // All of these checks are "end point based authentications"
       if (typeof args.username !== 'string' || !args.username) {
@@ -180,6 +198,7 @@ const resolvers = {
       return await createUser(args.username, args.email, args.passwordHash);
     },
 
+    // // Delete User By ID
     deleteUserById: async (
       parent: null,
       args: { id: string },
@@ -191,6 +210,7 @@ const resolvers = {
       return await deleteUserById(parseInt(args.id));
     },
 
+    // // Update User By ID
     updateUserById: async (
       parent: null,
       args: {
@@ -226,6 +246,43 @@ const resolvers = {
       );
     },
 
+    // Listing
+
+    // // Create Listing
+    createListing: async (parent: null, args: Listing) => {
+      // All of these checks are "end point based authentications"
+      if (typeof args.title !== 'string' || !args.title) {
+        throw new GraphQLError('Required field title is missing');
+      } else if (typeof args.price !== 'number' || !args.price) {
+        throw new GraphQLError('Required field price is missing');
+      } else if (typeof args.description !== 'string' || !args.description) {
+        throw new GraphQLError('Required field description is missing');
+      } else if (typeof args.image !== 'string' || !args.image) {
+        throw new GraphQLError('Required field image is missing');
+      } else if (typeof args.views !== 'number' || !args.views) {
+        throw new GraphQLError('Required field views is missing');
+      } else if (typeof args.userId !== 'number' || !args.userId) {
+        throw new GraphQLError('Required field userId is missing');
+      } else if (typeof args.categoryId !== 'number' || !args.categoryId) {
+        throw new GraphQLError('Required field categoryId is missing');
+      } else if (typeof args.statusId !== 'number' || !args.statusId) {
+        throw new GraphQLError('Required field statusId is missing');
+      }
+      return await createListing(
+        args.title,
+        args.price,
+        args.description,
+        args.image,
+        args.views,
+        args.userId,
+        args.categoryId,
+        args.statusId,
+      );
+    },
+
+    // Role
+
+    // // Create Role
     createRole: async (parent: null, args: CreateRoleArgs) => {
       if (typeof args.name !== 'string' || !args.name) {
         throw new GraphQLError('Required field "name" is missing');
@@ -233,6 +290,9 @@ const resolvers = {
       return await createRole(args.name);
     },
 
+    // Category
+
+    // // Create Category
     createCategory: async (parent: null, args: CreateCategoryArgs) => {
       if (typeof args.name !== 'string' || !args.name) {
         throw new GraphQLError('Required field "name" is missing');
@@ -242,6 +302,7 @@ const resolvers = {
       return await createCategory(args.name, args.image);
     },
 
+    // // Update Category By ID
     updateCategoryById: async (
       parent: null,
       args: { id: string; name: string; image: string },
@@ -253,6 +314,7 @@ const resolvers = {
       return await updateCategoryById(parseInt(args.id), args.name, args.image);
     },
 
+    // // Delete Category By ID
     deleteCategoryById: async (
       parent: null,
       args: { id: string },
@@ -263,6 +325,10 @@ const resolvers = {
       }
       return await deleteCategoryById(parseInt(args.id));
     },
+
+    // Authentication
+
+    // // Login
 
     login: async (
       parent: null,
@@ -293,6 +359,8 @@ const resolvers = {
 
       return await getUserByUsername(args.username);
     },
+
+    // // Register
 
     register: async (
       parent: null,
