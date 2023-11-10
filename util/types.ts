@@ -31,6 +31,21 @@ export type User = {
   roleId: number | null;
 };
 
+export type Listing = {
+  id: number;
+  title: string | null;
+  price: number | null;
+  lastName: string | null;
+  image: string | null;
+  description: string | null;
+  views: number | null;
+  created_at: Date | null;
+  updated_at: Date | null;
+  userId: number | null;
+  statusId: number | null;
+  categoryId: number | null;
+};
+
 export type CategoryResponse = {
   categories: {
     id: number;
