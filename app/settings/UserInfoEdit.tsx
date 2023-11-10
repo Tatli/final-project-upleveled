@@ -12,6 +12,15 @@ const getRoles = gql`
   }
 `;
 
+const getRoleById = gql`
+  query GetRoleById($roleId: ID!) {
+    role(id: $roleId) {
+      id
+      name
+    }
+  }
+`;
+
 const updateUserById = gql`
   mutation UpdateUserById(
     $id: ID!
@@ -61,10 +70,12 @@ const updateUserById = gql`
 `;
 
 export default function UserInfoEdit({ user }: { user: User }) {
+  const formattedBirthDate = user.birthDate?.toString().split('T')[0];
+
   const [username, setUsername] = useState(user.username);
   const [firstName, setFirstName] = useState(user.firstName);
   const [lastName, setLastName] = useState(user.lastName);
-  const [birthDate, setBirthDate] = useState(user.birthDate);
+  const [birthDate, setBirthDate] = useState(formattedBirthDate);
   const [address, setAddress] = useState(user.address);
   const [city, setCity] = useState(user.city);
   const [country, setCountry] = useState(user.country);
@@ -72,12 +83,20 @@ export default function UserInfoEdit({ user }: { user: User }) {
   const [email, setEmail] = useState(user.email);
   const [passwordHash, setPasswordHash] = useState(user.passwordHash);
   const [phone, setPhone] = useState(user.phone);
-  const [profileType, setProfileType] = useState(user.roleId); // Add Profile Type from API
+  const [roleId, setRoleId] = useState(user.roleId); // Add Profile Type from API
   const [onError, setOnError] = useState('');
   const [isEditing, setIsEditing] = useState(false);
 
-  const { data, refetch } = useSuspenseQuery<Role[]>(getRoles);
-  console.log('data from getRoles in UserInfoEdit', data);
+  const { data } = useSuspenseQuery<Role[]>(getRoles);
+  const roles = data.roles;
+
+  const userRoleId = user.roleId;
+
+  const { data: dataUserRole } = useSuspenseQuery<Role>(getRoleById, {
+    variables: { roleId: userRoleId },
+  });
+
+  const userRole = dataUserRole.role;
 
   const [handleUpdateUser] = useMutation(updateUserById, {
     variables: {
@@ -93,7 +112,7 @@ export default function UserInfoEdit({ user }: { user: User }) {
       email,
       passwordHash,
       phone,
-      profileType,
+      roleId,
     },
 
     onError: (error) => {
@@ -149,13 +168,12 @@ export default function UserInfoEdit({ user }: { user: User }) {
             <select
               id="profileType"
               className="select select-bordered w-full mb-2"
-              value={profileType}
+              value={roleId}
               onChange={(e) => {
-                setProfileType(parseInt(e.currentTarget.value));
-                console.log('profileType set to: ', profileType);
+                setRoleId(parseInt(e.currentTarget.value));
               }}
             >
-              {data.map((role) => {
+              {roles.map((role) => {
                 return (
                   <option key={`role-id-${role.id}`} value={role.id}>
                     {role.name}
@@ -318,7 +336,7 @@ export default function UserInfoEdit({ user }: { user: User }) {
             </label>
             <input
               id="profileType"
-              value={profileType}
+              value={userRole.name}
               // placeholder="Username"
               className="input input-bordered w-full mb-2"
               disabled
@@ -439,7 +457,6 @@ export default function UserInfoEdit({ user }: { user: User }) {
             onClick={async () => {
               await setIsEditing(false);
               await handleUpdateUser();
-              console.log('Running handleUpdateUser');
             }}
           >
             Save
