@@ -26,11 +26,12 @@ export default async function Settings() {
     redirect('/login');
   }
 
+  const loggedInUserId: number = data.loggedInUserByUsername.id;
   return (
     <div className="grid grid-cols-12 pt-16">
       <div className="sm:col-span-1 xl:col-span-2 2xl:col-span-3" />
 
-      <Listing />
+      <Listing loggedInUserId={loggedInUserId} />
 
       <div className="mt-24 sm:col-span-1 xl:col-span-2 2xl:col-span-3" />
     </div>

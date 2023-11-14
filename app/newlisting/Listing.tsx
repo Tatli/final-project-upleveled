@@ -1,15 +1,72 @@
 'use client';
+import { gql, useMutation } from '@apollo/client';
+import { CldUploadButton } from 'next-cloudinary';
+import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import Categories from './Categories';
 
-export default function Listing() {
+const createListing = gql`
+  mutation CreateListing(
+    $title: String!
+    $price: Int!
+    $description: String!
+    $image: String
+    $userId: Int
+    $categoryId: Int
+  ) {
+    createListing(
+      title: $title
+      price: $price
+      description: $description
+      image: $image
+      userId: $userId
+      categoryId: $categoryId
+    ) {
+      id
+      title
+      price
+      description
+      image
+      userId
+      categoryId
+    }
+  }
+`;
+
+export default function Listing({
+  loggedInUserId,
+}: {
+  loggedInUserId: number;
+}) {
   const [title, setTitle] = useState('');
-  const [price, setPrice] = useState('');
+  const [price, setPrice] = useState(0);
   const [description, setDescription] = useState('');
   const [image, setImage] = useState('');
-  const [userId, setUserId] = useState(0);
   const [categoryId, setCategoryId] = useState(0);
-  const [statusId, setStatusId] = useState(0);
+  const [onError, setOnError] = useState('');
+  const router = useRouter();
+
+  const [handleCreateListing] = useMutation(createListing, {
+    variables: {
+      title,
+      price,
+      description,
+      image,
+      userId: parseInt(loggedInUserId),
+      categoryId,
+    },
+
+    onError: (error) => {
+      setOnError(error.message);
+      return;
+    },
+
+    onCompleted: async () => {
+      setOnError('');
+      router.refresh();
+    },
+  });
+
   return (
     <div className="sm:col-span-10 xl:col-span-8 2xl:col-span-6">
       <h1 className="text-5xl pb-4">Create a new listing</h1>
@@ -21,7 +78,9 @@ export default function Listing() {
           <span className="label-text font-medium text-base">Title</span>
         </label>
         <input
+          value={title}
           id="title"
+          onChange={(e) => setTitle(e.currentTarget.value)}
           placeholder="e.g. Levi's 501 jeans, black, size 32"
           className="input input-bordered w-full mb-2"
         />
@@ -35,7 +94,16 @@ export default function Listing() {
         </label>
         <div className="join">
           <button className="btn join-item rounded-r-full ">$</button>
-          <input id="price" className="input input-bordered w-1/3 mb-2" />
+          <input
+            value={price}
+            type="number"
+            id="price"
+            className="input input-bordered w-1/3 mb-2"
+            onChange={(e) => {
+              setPrice(Number(e.target.value));
+              console.log('price: ', price);
+            }}
+          />
         </div>
 
         <label htmlFor="category">
@@ -43,14 +111,19 @@ export default function Listing() {
             Category
           </span>
         </label>
-        <Categories />
+        <Categories categoryId={categoryId} setCategoryId={setCategoryId} />
         <label htmlFor="description">
           <span id="description" className="label-text font-medium text-base">
             Description
           </span>
         </label>
         <textarea
+          value={description}
           className="textarea textarea-primary"
+          onChange={(e) => {
+            setDescription(e.currentTarget.value);
+            console.log('description:', description);
+          }}
           placeholder="e.g. dimensions, size, reasons for sale, defects/defects if any."
         />
 
@@ -60,9 +133,28 @@ export default function Listing() {
         <input
           id="image"
           type="file"
-          className="file-input file-input-bordered file-input-sm w-1/2 "
+          className="file-input file-input-sm w-1/2 file:rounded-full"
         />
-
+        <CldUploadButton
+          onError={(error) => {
+            console.log(error);
+          }}
+          onSuccess={(result) => {
+            if (typeof result.info === 'object' && 'public_id' in result.info) {
+              const publicId: string = result.info.public_id as string;
+              console.log('result.info.public_id: ', publicId);
+              setImage(publicId);
+            }
+          }}
+          uploadPreset="uwugz2aw"
+        />
+        <button
+          onClick={() => {
+            console.log('image inside button: ', image);
+          }}
+        >
+          Click me
+        </button>
         <br />
 
         <h2 className="text-3xl my-2">Contact and place of sale</h2>
@@ -127,7 +219,14 @@ export default function Listing() {
             />
           </div>
         </div>
-        <button className="btn btn-primary my-4 text-white">Publish</button>
+        <button
+          onClick={async () => {
+            await handleCreateListing();
+          }}
+          className="btn btn-primary my-4 text-white"
+        >
+          Publish
+        </button>
       </div>
     </div>
   );
