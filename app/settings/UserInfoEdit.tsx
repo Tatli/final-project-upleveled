@@ -153,9 +153,8 @@ export default function UserInfoEdit({ user }: { user: User }) {
               <span className="label-text">Password</span>
             </label>
             <input
-              value={passwordHash}
               id="password"
-              placeholder="password"
+              placeholder="New password"
               className="input input-bordered join-item w-full mb-2"
               onChange={(e) => {
                 setPasswordHash(e.currentTarget.value);
@@ -326,7 +325,7 @@ export default function UserInfoEdit({ user }: { user: User }) {
             </label>
             <input
               id="password"
-              placeholder="password"
+              placeholder="Password"
               className="input input-bordered join-item w-full mb-2"
               disabled
             />
