@@ -92,40 +92,44 @@ export default function RegisterForm() {
               }}
             />
           </label>
-          <div className="flex flex-col mt-1">
-            <label className="cursor-pointer">
-              <input
-                className="checkbox checkbox-primary mt-2"
-                type="checkbox"
-                checked={newsletter}
-                onChange={(e) => setNewsletter(e.currentTarget.checked)}
-              />
-              <span className="label-text mb-1 ml-1">Remember me</span>
-            </label>
-            <label className="cursor-pointer">
-              <input
-                className="checkbox checkbox-primary mt-2"
-                type="checkbox"
-                checked={acceptAgreements}
-                onChange={(e) => setAcceptAgreements(e.currentTarget.checked)}
-              />
-              <span className="label-text mb-1 ml-1">
-                By continuing, I agree to the Firsthand Account{' '}
-                <Link
-                  className="text-primary hover:text-primary-focus"
-                  href="/register"
-                >
-                  Terms of Service
-                </Link>{' '}
-                and{' '}
-                <Link
-                  className="text-primary hover:text-primary-focus"
-                  href="/register"
-                >
-                  Privacy Policy
-                </Link>
-              </span>
-            </label>
+          <div className="flex flex-col align-baseline mt-1">
+            <div>
+              <label className="cursor-pointer">
+                <input
+                  className="checkbox checkbox-primary mt-2"
+                  type="checkbox"
+                  checked={newsletter}
+                  onChange={(e) => setNewsletter(e.currentTarget.checked)}
+                />
+                <span className="label-text mb-1 ml-1">Remember me</span>
+              </label>
+            </div>
+            <div>
+              <label className="cursor-pointer">
+                <input
+                  className="checkbox checkbox-primary mt-2"
+                  type="checkbox"
+                  checked={acceptAgreements}
+                  onChange={(e) => setAcceptAgreements(e.currentTarget.checked)}
+                />
+                <span className="label-text mb-1 ml-1">
+                  By continuing, I agree to the Firsthand Account{' '}
+                  <Link
+                    className="text-primary hover:text-primary-focus"
+                    href="/register"
+                  >
+                    Terms of Service
+                  </Link>{' '}
+                  and{' '}
+                  <Link
+                    className="text-primary hover:text-primary-focus"
+                    href="/register"
+                  >
+                    Privacy Policy
+                  </Link>
+                </span>
+              </label>
+            </div>
           </div>
           <button
             className="btn btn-primary my-4 text-white"
