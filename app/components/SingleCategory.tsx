@@ -13,17 +13,18 @@ export default function SingleCategory({
   publicId: string;
 }) {
   const url = getCldImageUrl({
-    width: 1024,
-    height: 1024,
+    width: 512,
+    height: 512,
     src: publicId,
   });
 
-  // console.log('name inside SingleCategory', name);
-  // console.log('publicId inside SingleCategory', publicId);
-
   return (
     <Link href={`/categories/${id}`} className="col-span-2 m-2 text-center">
-      <img src={url} alt={name} />
+      <img
+        className="border-4 border-white hover:border-primary rounded-md"
+        src={url}
+        alt={name}
+      />
 
       <span>{name}</span>
     </Link>
