@@ -39,47 +39,46 @@ export default async function RootLayout({
 
   return (
     <html lang="en" data-theme="corporate">
-      <body
-        className={`${inter.className} flex flex-col h-screen justify-between`}
-      >
+      <body className={`${inter.className} `}>
         <nav>
           <div className="navbar bg-base-100">
             <div className="flex-1">
-              <Link className="btn btn-ghost normal-case text-xl" href="/">
+              <Link
+                className="ml-8 border-y-4 border-white hover:border-primary border-primary normal-case text-2xl font-medium"
+                href="/"
+              >
                 Firsthand
               </Link>
             </div>
-            <div className="flex-none">
-              <ul className="menu menu-horizontal px-1">
-                <li>
+            <div className="flex-none mr-6">
+              <ul className="menu menu-horizontal mt-2 px-1">
+                <li className="border-b-4 border-white hover:border-primary hover:font-medium">
                   <Link href="/newlisting">
-                    <div className="badge badge-primary text- text-white p-2">
-                      Create new listing
-                    </div>
+                    <div>Create new listing</div>
                   </Link>
                 </li>
-                <li>
+                <li className="border-b-4 border-white hover:border-primary hover:font-medium">
                   <Link href="/categories">Categories</Link>
                 </li>
                 {data.loggedInUserByUsername?.username ? (
-                  <li>
+                  <li className="border-b-4 border-white hover:border-primary hover:font-medium mr-4">
                     <LogoutButton />
                   </li>
                 ) : (
                   <>
-                    <li>
+                    <li className="hover:border-b-4 border-primary hover:font-medium">
                       <Link href="/login">Login</Link>
                     </li>
-                    <li className="pr-5">
+                    <li className="hover:border-b-4 border-primary hover:font-medium">
                       <Link href="/register">Register</Link>
                     </li>
                   </>
                 )}
 
                 {data.loggedInUserByUsername?.username ? (
-                  <li>
+                  <li className="border-b-4 border-white hover:border-primary">
                     <details>
-                      <summary className="mx-2">
+                      <summary className="px-2">
                         {data.loggedInUserByUsername.username}
                       </summary>
                       <ul className="bg-base-100 z-10">
@@ -100,7 +99,9 @@ export default async function RootLayout({
           </div>
         </nav>
         {/* <div className="mx-2 sm:mx-8 lg:mx-24 2xl:mx-40"> */}
-        <ApolloClientProvider>{children}</ApolloClientProvider>
+        <div className="min-h-screen">
+          <ApolloClientProvider>{children}</ApolloClientProvider>
+        </div>
         <Footer />
       </body>
     </html>
