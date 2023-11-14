@@ -14,6 +14,10 @@ export type CreateCategoryArgs = {
   image: string;
 };
 
+export type CategoryId = {
+  id: number;
+};
+
 export type User = {
   id: number;
   username: string | null;
@@ -85,4 +89,9 @@ export type FakeAdminUserContext = {
 export type Role = {
   id: number;
   name: string;
+};
+
+export type CategoriesProps = {
+  categoryId: number;
+  setCategoryId: React.Dispatch<React.SetStateAction<number>>;
 };

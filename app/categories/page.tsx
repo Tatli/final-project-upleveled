@@ -4,6 +4,7 @@ import { cookies } from 'next/headers';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { getClient } from '../../util/apolloClient';
+import Categories from '../components/Categories';
 
 // export type LoggedInUserResponse = {
 //   id: number;
@@ -45,36 +46,7 @@ export default async function CategoriesPage() {
 
   return (
     <section className="mx-2 sm:mx-8 lg:mx-24 2xl:mx-40">
-      <Link className="btn btn-info" href="/categories/admin">
-        Manage Categories
-      </Link>
-
-      <br />
-      <br />
-
-      <h1 className="text-2xl">Categories</h1>
-
-      <div className="gap-4">
-        {data.categories.map((category) => {
-          return (
-            <div
-              key={`category-div-${category.id}`}
-              data-test-id={`category-type-${category.id}`}
-            >
-              <Link href={`/categories/${category.id}`}>
-                <p className="badge badge-outline">{category.name}</p>{' '}
-                <p className="badge badge-accent"> {category.image}</p>
-                {/* <Image
-                src={`${category.image}`} // To-add
-                alt={category.name}
-                width={200}
-                height={200}
-              /> */}
-              </Link>
-            </div>
-          );
-        })}
-      </div>
+      <Categories />
     </section>
   );
 }

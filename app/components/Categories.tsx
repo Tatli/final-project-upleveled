@@ -1,5 +1,6 @@
 'use client';
 import { gql, useQuery } from '@apollo/client';
+import Link from 'next/link';
 import { Category } from '../../migrations/00001-createTableCategories';
 import SingleCategory from './SingleCategory';
 
@@ -16,7 +17,8 @@ const getAllCategoriesQuery = gql`
 export default function Categories() {
   const { data, loading, error } = useQuery(getAllCategoriesQuery);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading)
+    return <div className="mx-2 sm:mx-8 lg:mx-24 2xl:mx-40">Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
 
   const categories: Category[] = data.categories;
@@ -36,6 +38,9 @@ export default function Categories() {
           );
         })}
       </div>
+      <Link className="btn btn-info" href="/categories/admin">
+        Manage Categories
+      </Link>
     </section>
   );
 }

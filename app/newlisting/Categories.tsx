@@ -1,7 +1,7 @@
 'use client';
 import { gql, useSuspenseQuery } from '@apollo/client';
 import React from 'react';
-import { Category } from '../../migrations/00001-createTableCategories';
+import { CategoriesProps, CategoryResponse } from '../../util/types';
 
 const getCategories = gql`
   query GetCategories {
@@ -12,11 +12,16 @@ const getCategories = gql`
   }
 `;
 
-export default function Categories() {
-  const { data } = useSuspenseQuery<Category>(getCategories);
-  console.log('data: ', data);
+export default function Categories({
+  categoryId,
+  setCategoryId,
+}: CategoriesProps) {
+  const { data } = useSuspenseQuery<CategoryResponse>(getCategories);
+  // console.log('data: ', data);
   const categories = data.categories;
-  console.log('categories: ', categories);
+  // console.log('categories: ', categories);
+
+  // console.log('Props: categoryId: ', categoryId);
 
   return (
     <>
@@ -40,7 +45,13 @@ export default function Categories() {
                   type="radio"
                   name="radio-2"
                   className="radio radio-primary mr-2"
-                  onChange={(e) => setCategory}
+                  onChange={(e) => {
+                    console.log(
+                      `Category inside dialog with id ${category.id} has been checked`,
+                    );
+                    setCategoryId(parseInt(category.id));
+                    console.log(`Value inside categoryId: `, categoryId);
+                  }}
                 />
                 <span>{category.name}</span>
               </div>
