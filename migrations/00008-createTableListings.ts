@@ -8,12 +8,12 @@ CREATE TABLE listings (
     price integer NOT NULL,
     image VARCHAR(255) ,
     description TEXT NOT NULL,
-    views integer,
+    views integer DEFAULT 0,
     created_at timestamp DEFAULT NOW(),
     updated_at timestamp DEFAULT NOW(),
     user_id integer REFERENCES users(id) ON DELETE SET NULL,
-    category_id integer REFERENCES categories(id) ON DELETE SET NULL
-    status_id integer REFERENCES status(id) ON DELETE SET NULL,
+    category_id integer REFERENCES categories(id) ON DELETE SET NULL,
+    status_id integer DEFAULT 1 REFERENCES status(id) ON DELETE SET NULL
 );
 `;
 }

@@ -18,7 +18,8 @@ CREATE TABLE users (
     password_hash VARCHAR(50) NOT NULL,
     phone VARCHAR(30) ,
     image VARCHAR(255) ,
-    role_id integer REFERENCES roles(id) ON DELETE SET NULL
+    registration_date timestamp DEFAULT NOW(),
+    role_id integer DEFAULT 1 REFERENCES roles(id) ON DELETE SET NULL
 );
 `;
 }

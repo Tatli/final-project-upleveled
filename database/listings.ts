@@ -21,22 +21,32 @@ export const getListingById = cache(async (id: number) => {
   return listing;
 });
 
+// export const getUserListings = cache(async (userId: number) => {
+//   const [listing] = await sql<Listing[]>`
+//     SELECT
+//       *
+//     FROM
+//       listings
+//     WHERE
+//       user_id = ${userId}
+//   `;
+//   return listing;
+// });
+
 export const createListing = cache(
   async (
     title: string,
     price: number,
     description: string,
     image: string,
-    views: number,
     userId: number,
     categoryId: number,
-    statusId: number,
   ) => {
     const [listing] = await sql<Listing[]>`
       INSERT INTO listings
-        (title, price, description, image, views, user_id, category_id, status_id )
+        (title, price, description, image, user_id, category_id )
       VALUES
-        (${title}, ${price}, ${description}, ${image}, ${views} , ${userId}, ${categoryId}, ${statusId})
+        (${title}, ${price}, ${description}, ${image}, ${userId}, ${categoryId})
       RETURNING *
     `;
 

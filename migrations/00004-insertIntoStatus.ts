@@ -1,14 +1,15 @@
 import { Sql } from 'postgres';
 
 export async function up(sql: Sql) {
-  await sql`INSERT INTO roles
+  await sql`INSERT INTO status
     (name)
     VALUES
-    ('Private'),
-    ('Commercial')
+    ('Active'),
+    ('Sold'),
+    ('Inactive')
 `;
 }
 
 export async function down(sql: Sql) {
-  await sql`DELETE FROM roles`;
+  await sql`DELETE FROM status`;
 }
