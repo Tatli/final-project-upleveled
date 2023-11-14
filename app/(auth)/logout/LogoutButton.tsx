@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { redirect, useRouter } from 'next/navigation';
 import { logout } from './action';
 
 export function LogoutButton() {
@@ -10,6 +10,7 @@ export function LogoutButton() {
       <button
         formAction={async () => {
           await logout();
+          redirect('/');
           router.refresh();
         }}
       >
