@@ -134,7 +134,7 @@ export default function CreateNewListing({
           <span className="label-text font-medium text-base ">Image</span>
         </label>
         <CldUploadButton
-          className=" bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full w-1/4"
+          className="btn btn-outline btn-primary text-white font-bold py-2 px-4 rounded-xl w-1/4"
           onError={(error) => {
             console.log(error);
           }}
