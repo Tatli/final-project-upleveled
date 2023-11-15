@@ -37,13 +37,16 @@ export const getUserListingsWithCategoryName = cache(async (userId: number) => {
   const listings = await sql<Listing[]>`
 SELECT
   listings.*,
-  categories.name AS category_name
+  categories.name AS category_name,
+  users.username AS username,
+  status.name AS status_name
 FROM
   listings
 INNER JOIN categories ON categories.id = listings.category_id
+INNER JOIN users ON users.id = listings.user_id
+INNER JOIN status ON status.id = listings.status_id
 WHERE
   listings.user_id = ${userId};
-
   `;
   return listings;
 });

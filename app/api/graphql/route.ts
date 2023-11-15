@@ -80,6 +80,8 @@ const typeDefs = gql`
     statusId: Int
     categoryId: Int
     categoryName: String
+    username: String
+    statusName: String
   }
   type Role {
     id: ID!

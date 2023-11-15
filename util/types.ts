@@ -55,6 +55,8 @@ export type Listing = {
   statusId: number | null;
   categoryId: number | null;
   categoryName: number | null;
+  username: number | null;
+  statusName: number | null;
 };
 
 export type CategoryResponse = {
