@@ -13,7 +13,11 @@ import {
   getCategoryById,
   updateCategoryById,
 } from '../../../database/categories';
-import { createListing } from '../../../database/listings';
+import {
+  createListing,
+  getListings,
+  getUserListingsWithCategoryName,
+} from '../../../database/listings';
 import { createRole, getRoleById, getRoles } from '../../../database/roles';
 import {
   createUser,
@@ -59,6 +63,7 @@ const typeDefs = gql`
     country: String
     phone: String
     image: String
+    registrationDate: Date
     roleId: Int
   }
 
@@ -73,7 +78,8 @@ const typeDefs = gql`
     updatedAt: Date
     userId: Int
     statusId: Int
-    categoriesId: Int
+    categoryId: Int
+    categoryName: String
   }
   type Role {
     id: ID!
@@ -90,6 +96,9 @@ const typeDefs = gql`
 
     category(id: ID!): Category
     categories: [Category!]!
+
+    listings: [Listing!]!
+    userListingsWithCategoryName(id: ID!): [Listing!]!
   }
 
   type Mutation {
@@ -137,13 +146,11 @@ const typeDefs = gql`
     ## Create
     createListing(
       title: String!
-      price: String!
+      price: Int!
       description: String!
       image: String
-      views: Int
       userId: Int
-      category_Id: Int
-      statusId: Int
+      categoryId: Int
     ): Listing!
   }
 `;
@@ -174,6 +181,17 @@ const resolvers = {
       return await getCategories();
     },
 
+    listings: async () => {
+      return await getListings();
+    },
+
+    userListingsWithCategoryName: async (
+      parent: null,
+      args: { id: string },
+    ) => {
+      return await getUserListingsWithCategoryName(parseInt(args.id));
+    },
+
     loggedInUserByUsername: async (
       parent: null,
       args: { username: string },
@@ -195,6 +213,33 @@ const resolvers = {
       } else if (typeof args.passwordHash !== 'string' || !args.passwordHash) {
         throw new GraphQLError('Required field passwordHash is missing');
       }
+
+      // const hashedPassword = await bcrypt.hash(args.passwordHash, 10);
+
+      // const newUser = await createUser(
+      //   args.username,
+      //   args.email,
+      //   args.passwordHash,
+      // );
+
+      // if (!newUser) {
+      //   throw new GraphQLError('No user was created');
+      // }
+
+      // const payload = {
+      //   userId: newUser.id,
+      //   username: newUser.username,
+      //   email: newUser.email,
+      // };
+
+      // const options = {
+      //   expiresIn: '24h',
+      // };
+      // const token = jwt.sign(payload, process.env.JWT_SECRET!.optioins);
+      // console.log('token: ', token);
+
+      // const session = await createSessi
+
       return await createUser(args.username, args.email, args.passwordHash);
     },
 
@@ -257,26 +302,18 @@ const resolvers = {
         throw new GraphQLError('Required field price is missing');
       } else if (typeof args.description !== 'string' || !args.description) {
         throw new GraphQLError('Required field description is missing');
-      } else if (typeof args.image !== 'string' || !args.image) {
-        throw new GraphQLError('Required field image is missing');
-      } else if (typeof args.views !== 'number' || !args.views) {
-        throw new GraphQLError('Required field views is missing');
       } else if (typeof args.userId !== 'number' || !args.userId) {
         throw new GraphQLError('Required field userId is missing');
       } else if (typeof args.categoryId !== 'number' || !args.categoryId) {
         throw new GraphQLError('Required field categoryId is missing');
-      } else if (typeof args.statusId !== 'number' || !args.statusId) {
-        throw new GraphQLError('Required field statusId is missing');
       }
       return await createListing(
         args.title,
         args.price,
         args.description,
         args.image,
-        args.views,
         args.userId,
         args.categoryId,
-        args.statusId,
       );
     },
 
