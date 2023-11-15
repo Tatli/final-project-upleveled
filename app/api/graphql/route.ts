@@ -16,6 +16,9 @@ import {
 import {
   createListing,
   getListings,
+  getUserListingByListingIdJoined,
+  getUserListingsByListingIdJoined,
+  getUserListingsByUserIdJoined,
   getUserListingsWithCategoryName,
 } from '../../../database/listings';
 import { createRole, getRoleById, getRoles } from '../../../database/roles';
@@ -100,7 +103,8 @@ const typeDefs = gql`
     categories: [Category!]!
 
     listings: [Listing!]!
-    userListingsWithCategoryName(id: ID!): [Listing!]!
+    userListingsByUserIdJoined(id: ID!): [Listing!]!
+    userListingByListingIdJoined(id: ID!): [Listing!]!
   }
 
   type Mutation {
@@ -154,6 +158,11 @@ const typeDefs = gql`
       userId: Int
       categoryId: Int
     ): Listing!
+
+    # ## Update
+    # updateListingTitle(
+    #   title: String!
+    # )
   }
 `;
 
@@ -187,11 +196,15 @@ const resolvers = {
       return await getListings();
     },
 
-    userListingsWithCategoryName: async (
+    userListingsByUserIdJoined: async (parent: null, args: { id: string }) => {
+      return await getUserListingsByUserIdJoined(parseInt(args.id));
+    },
+
+    userListingByListingIdJoined: async (
       parent: null,
       args: { id: string },
     ) => {
-      return await getUserListingsWithCategoryName(parseInt(args.id));
+      return await getUserListingByListingIdJoined(parseInt(args.id));
     },
 
     loggedInUserByUsername: async (
@@ -237,7 +250,7 @@ const resolvers = {
       // const options = {
       //   expiresIn: '24h',
       // };
-      // const token = jwt.sign(payload, process.env.JWT_SECRET!.optioins);
+      // const token = jwt.sign(payload, process.env.JWT_SECRET!.options);
       // console.log('token: ', token);
 
       // const session = await createSessi

@@ -3,7 +3,7 @@ import { gql, useMutation } from '@apollo/client';
 import { CldUploadButton } from 'next-cloudinary';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
-import CategoriesDialog from './CategoriesDialog';
+import Categories from './CategoriesDialog';
 
 const createListing = gql`
   mutation CreateListing(
@@ -33,47 +33,17 @@ const createListing = gql`
   }
 `;
 
-export default function CreateNewListing({
-  loggedInUserId,
-}: {
-  loggedInUserId: number;
-}) {
-  const [title, setTitle] = useState('');
-  const [price, setPrice] = useState(0);
-  const [description, setDescription] = useState('');
-  const [image, setImage] = useState('');
-  const [categoryId, setCategoryId] = useState(0);
-  const [onError, setOnError] = useState('');
-  const router = useRouter();
-
-  const [handleCreateListing] = useMutation(createListing, {
-    variables: {
-      title,
-      price,
-      description,
-      image,
-      userId: parseInt(loggedInUserId),
-      categoryId,
-    },
-
-    onError: (error) => {
-      setOnError(error.message);
-      return;
-    },
-
-    onCompleted: async () => {
-      setOnError('');
-      router.refresh();
-    },
-  });
+export default function EditUserListing({ listingId }: { listingId: number }) {
+  // Get User of listing
 
   return (
     <div className="sm:col-span-10 xl:col-span-8 2xl:col-span-6">
-      <h1 className="text-5xl pb-4">Create a new listing</h1>
+      <h1 className="text-5xl pb-4">Edit Listing</h1>
       <hr />
       <br />
       <h2 className="text-3xl pb-2">Listing details</h2>
       <div className="form-control w-full gap-1">
+        {/* Title */}
         <label htmlFor="title">
           <span className="label-text font-medium text-base">Title</span>
         </label>
@@ -89,6 +59,7 @@ export default function CreateNewListing({
           your chances of making a sale.
         </span>
 
+        {/* Price */}
         <label htmlFor="price">
           <span className="label-text font-medium text-base">Price</span>
         </label>
@@ -106,15 +77,15 @@ export default function CreateNewListing({
           />
         </div>
 
+        {/* Category */}
         <label htmlFor="category">
           <span id="category" className="label-text font-medium text-base">
             Category
           </span>
         </label>
-        <CategoriesDialog
-          categoryId={categoryId}
-          setCategoryId={setCategoryId}
-        />
+        <Categories categoryId={categoryId} setCategoryId={setCategoryId} />
+
+        {/* Description */}
         <label htmlFor="description">
           <span id="description" className="label-text font-medium text-base">
             Description
@@ -130,11 +101,19 @@ export default function CreateNewListing({
           placeholder="e.g. dimensions, size, reasons for sale, defects/defects if any."
         />
 
+        {/* Status */}
+        <label htmlFor="description">
+          <span id="description" className="label-text font-medium text-base">
+            Status
+          </span>
+        </label>
+
+        {/* Image */}
         <label htmlFor="image">
           <span className="label-text font-medium text-base ">Image</span>
         </label>
         <CldUploadButton
-          className="btn btn-outline btn-primary text-white font-bold py-2 px-4 w-1/6"
+          className=" bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full w-1/4"
           onError={(error) => {
             console.log(error);
           }}

@@ -26,7 +26,7 @@ export default function CategoriesDialog({
   return (
     <>
       <button
-        className="btn btn-outline btn-primary text-white font-bold py-2 px-4 rounded-xl w-1/4"
+        className="btn btn-outline btn-primary text-white font-bold py-2 px-4 w-1/5"
         onClick={() => document.getElementById('my_modal_1').showModal()}
       >
         Show Categories

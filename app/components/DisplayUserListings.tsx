@@ -2,14 +2,13 @@
 import { gql } from '@apollo/client';
 import { useSuspenseQuery } from '@apollo/experimental-nextjs-app-support/ssr';
 import { CldImage } from 'next-cloudinary';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 import { Listing } from '../../util/types';
 
-const getUserListingsWithCategoryName = gql`
+const getUserListingsByUserIdJoined = gql`
   query UserListings($userId: ID!) {
-    userListingsWithCategoryName(id: $userId) {
+    userListingsByUserIdJoined(id: $userId) {
       id
       title
       price
@@ -33,13 +32,13 @@ export default function UserListings(loggedInUserId: number) {
   const router = useRouter();
 
   const { data, error } = useSuspenseQuery<Listing>(
-    getUserListingsWithCategoryName,
+    getUserListingsByUserIdJoined,
     {
       variables: { userId },
     },
   );
 
-  const userListings: Listing[] = data.userListingsWithCategoryName;
+  const userListings: Listing[] = data.userListingsByUserIdJoined;
   console.log('userListings, ', userListings);
 
   userListings.map((listing) => {

@@ -33,7 +33,7 @@ export const getUserListings = cache(async (userId: number) => {
   return listings;
 });
 
-export const getUserListingsWithCategoryName = cache(async (userId: number) => {
+export const getUserListingsByUserIdJoined = cache(async (userId: number) => {
   const listings = await sql<Listing[]>`
 SELECT
   listings.*,
@@ -50,6 +50,26 @@ WHERE
   `;
   return listings;
 });
+
+export const getUserListingByListingIdJoined = cache(
+  async (listingId: number) => {
+    const listing = await sql<Listing[]>`
+SELECT
+  listings.*,
+  categories.name AS category_name,
+  users.username AS username,
+  status.name AS status_name
+FROM
+  listings
+INNER JOIN categories ON categories.id = listings.category_id
+INNER JOIN users ON users.id = listings.user_id
+INNER JOIN status ON status.id = listings.status_id
+WHERE
+    listings.id = ${listingId};
+  `;
+    return listing;
+  },
+);
 
 export const createListing = cache(
   async (
