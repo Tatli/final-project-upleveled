@@ -209,7 +209,7 @@ const resolvers = {
     createUser: async (parent: null, args: CreateUserArgs) => {
       // All of these checks are "end point based authentications"
       if (typeof args.username !== 'string' || !args.username) {
-        throw new GraphQLError('Required field is missing');
+        throw new GraphQLError('Required field username is missing');
       } else if (typeof args.email !== 'string' || !args.email) {
         throw new GraphQLError('Required field email is missing');
       } else if (typeof args.passwordHash !== 'string' || !args.passwordHash) {
