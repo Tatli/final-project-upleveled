@@ -1,4 +1,4 @@
-import { gql, useMutation, useQuery } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 import { useSuspenseQuery } from '@apollo/experimental-nextjs-app-support/ssr';
 import React, { useState } from 'react';
 import { Role, User } from '../../util/types';

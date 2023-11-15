@@ -18,6 +18,12 @@ export type CategoryId = {
   id: number;
 };
 
+export type Category = {
+  id: number;
+  name: string;
+  image: string;
+};
+
 export type User = {
   id: number;
   username: string | null;
@@ -48,6 +54,7 @@ export type Listing = {
   userId: number | null;
   statusId: number | null;
   categoryId: number | null;
+  categoryName: number | null;
 };
 
 export type CategoryResponse = {

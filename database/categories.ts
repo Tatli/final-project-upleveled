@@ -1,5 +1,5 @@
 import { cache } from 'react';
-import { Category } from '../migrations/00001-createTableCategories';
+import { Category } from '../util/types';
 import { sql } from './connect';
 
 export const getCategories = cache(async () => {

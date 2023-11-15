@@ -1,7 +1,7 @@
 'use client';
 import { gql, useQuery } from '@apollo/client';
 import Link from 'next/link';
-import { Category } from '../../migrations/00001-createTableCategories';
+import { Category } from '../../util/types';
 import SingleCategory from './SingleCategory';
 
 const getAllCategoriesQuery = gql`

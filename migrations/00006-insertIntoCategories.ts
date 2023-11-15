@@ -1,10 +1,5 @@
 import { Sql } from 'postgres';
 
-export type Category = {
-  id: number;
-  name: string;
-  image: string;
-};
 export async function up(sql: Sql) {
   await sql`INSERT INTO categories
     (name, image)
