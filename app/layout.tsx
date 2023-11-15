@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { getClient } from '../util/apolloClient';
 import { LogoutButton } from './(auth)/logout/LogoutButton';
 import { ApolloClientProvider } from './ApolloClientProvider';
-import Footer from './components/footer/daisyui/Footer';
+import Footer from './components/Footer';
 
 const inter = Inter({ subsets: ['latin'] });
 
