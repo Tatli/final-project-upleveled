@@ -12,7 +12,7 @@ const getCategories = gql`
   }
 `;
 
-export default function Categories({
+export default function CategoriesDialog({
   categoryId,
   setCategoryId,
 }: CategoriesProps) {

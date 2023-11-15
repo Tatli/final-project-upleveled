@@ -3,7 +3,7 @@ import { gql } from '@apollo/client';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { getClient } from '../../util/apolloClient';
-import NewListing from './NewListing';
+import CreateNewListing from '../components/CreateNewListing';
 
 export default async function Settings() {
   const fakeSessionToken = cookies().get('fakeSession');
@@ -31,7 +31,7 @@ export default async function Settings() {
     <div className="grid grid-cols-12 pt-16">
       <div className="sm:col-span-1 xl:col-span-2 2xl:col-span-3" />
 
-      <NewListing loggedInUserId={loggedInUserId} />
+      <CreateNewListing loggedInUserId={loggedInUserId} />
 
       <div className="mt-24 sm:col-span-1 xl:col-span-2 2xl:col-span-3" />
     </div>

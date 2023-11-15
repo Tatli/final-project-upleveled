@@ -3,7 +3,7 @@ import { gql, useMutation } from '@apollo/client';
 import { CldUploadButton } from 'next-cloudinary';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
-import Categories from './Categories';
+import CategoriesDialog from './CategoriesDialog';
 
 const createListing = gql`
   mutation CreateListing(
@@ -33,7 +33,7 @@ const createListing = gql`
   }
 `;
 
-export default function NewListing({
+export default function CreateNewListing({
   loggedInUserId,
 }: {
   loggedInUserId: number;
@@ -111,7 +111,10 @@ export default function NewListing({
             Category
           </span>
         </label>
-        <Categories categoryId={categoryId} setCategoryId={setCategoryId} />
+        <CategoriesDialog
+          categoryId={categoryId}
+          setCategoryId={setCategoryId}
+        />
         <label htmlFor="description">
           <span id="description" className="label-text font-medium text-base">
             Description

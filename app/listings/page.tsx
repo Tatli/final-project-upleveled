@@ -1,7 +1,7 @@
 import { gql } from '@apollo/client';
 import { cookies } from 'next/headers';
 import { getClient } from '../../util/apolloClient';
-import UserListings from './UserListings';
+import DisplayUserListings from '../components/DisplayUserListings';
 
 export default async function Listings() {
   const fakeSessionToken = cookies().get('fakeSession');
@@ -30,7 +30,7 @@ export default async function Listings() {
           <h1 className="text-2xl mx-auto">Your Listings</h1>
 
           <div className="grid grid-cols-2">
-            <UserListings loggedInUserId={loggedInUserId} />
+            <DisplayUserListings loggedInUserId={loggedInUserId} />
           </div>
         </div>
         <div className="col-span-1" />
