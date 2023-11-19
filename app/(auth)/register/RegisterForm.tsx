@@ -101,7 +101,9 @@ export default function RegisterForm() {
                   checked={newsletter}
                   onChange={(e) => setNewsletter(e.currentTarget.checked)}
                 />
-                <span className="label-text mb-1 ml-1">Remember me</span>
+                <span className="label-text mb-1 ml-1">
+                  Sign up for Newsletter
+                </span>
               </label>
             </div>
             <div>
