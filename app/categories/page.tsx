@@ -4,6 +4,7 @@ import { cookies } from 'next/headers';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { getClient } from '../../util/apolloClient';
+import { CategoryResponse } from '../../util/types';
 import Categories from '../components/Categories';
 
 // export type LoggedInUserResponse = {
