@@ -45,12 +45,11 @@ export type Listing = {
   id: number;
   title: string | null;
   price: number | null;
-  lastName: string | null;
   image: string | null;
   description: string | null;
   views: number | null;
-  created_at: Date | null;
-  updated_at: Date | null;
+  createdAt: Date | null;
+  updatedAt: Date | null;
   userId: number | null;
   statusId: number | null;
   categoryId: number | null;
@@ -103,4 +102,11 @@ export type Role = {
 export type CategoriesProps = {
   categoryId: number;
   setCategoryId: React.Dispatch<React.SetStateAction<number>>;
+};
+
+export type EditUserListingPropParams = { listingId: string };
+
+export type Status = {
+  id: number;
+  name: string;
 };
