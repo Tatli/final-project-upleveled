@@ -15,13 +15,16 @@ import {
 } from '../../../database/categories';
 import {
   createListing,
+  deleteListingById,
   getListings,
   getUserListingByListingIdJoined,
-  getUserListingsByListingIdJoined,
   getUserListingsByUserIdJoined,
-  getUserListingsWithCategoryName,
+  updateListingById,
+  updateListingImageByListingId,
+  updateListingTitleById,
 } from '../../../database/listings';
 import { createRole, getRoleById, getRoles } from '../../../database/roles';
+import { getStatuses } from '../../../database/status';
 import {
   createUser,
   deleteUserById,
@@ -30,6 +33,7 @@ import {
   getUsers,
   isUserAdminBySessionToken,
   updateUserById,
+  updateUserImageByUserId,
 } from '../../../database/users';
 import {
   CreateCategoryArgs,
@@ -102,6 +106,8 @@ const typeDefs = gql`
     category(id: ID!): Category
     categories: [Category!]!
 
+    getStatuses: [Status]
+
     listings: [Listing!]!
     userListingsByUserIdJoined(id: ID!): [Listing!]!
     userListingByListingIdJoined(id: ID!): [Listing!]!
@@ -128,7 +134,10 @@ const typeDefs = gql`
       passwordHash: String
       phone: String
       roleId: Int
+      image: String
     ): User!
+
+    updateUserImageByUserId(id: ID!, image: String): User!
 
     # Roles
     ## Create
@@ -159,10 +168,22 @@ const typeDefs = gql`
       categoryId: Int
     ): Listing!
 
-    # ## Update
-    # updateListingTitle(
-    #   title: String!
-    # )
+    ## Update
+    updateListingTitleById(id: ID!, title: String!): Listing
+    updateListingImageByListingId(id: ID!, image: String!): Listing
+    updateListingById(
+      id: ID!
+      title: String
+      price: Int
+      description: String
+      image: String
+      updatedAt: Date
+      categoryId: Int
+      statusId: Int
+    ): Listing!
+
+    ## Delete
+    deleteListingById(id: ID!): Listing
   }
 `;
 
@@ -194,6 +215,10 @@ const resolvers = {
 
     listings: async () => {
       return await getListings();
+    },
+
+    getStatuses: async () => {
+      return await getStatuses();
     },
 
     userListingsByUserIdJoined: async (parent: null, args: { id: string }) => {
@@ -287,6 +312,7 @@ const resolvers = {
         passwordHash: string;
         phone: string;
         roleId: number;
+        image: string;
       },
     ) => {
       return await updateUserById(
@@ -303,9 +329,20 @@ const resolvers = {
         args.passwordHash,
         args.phone,
         args.roleId,
+        args.image,
       );
     },
 
+    // // Update User Image By UserId
+    updateUserImageByUserId: async (
+      parent: null,
+      args: {
+        id: string;
+        image: string;
+      },
+    ) => {
+      return await updateUserImageByUserId(parseInt(args.id), args.image);
+    },
     // Listing
 
     // // Create Listing
@@ -313,14 +350,14 @@ const resolvers = {
       // All of these checks are "end point based authentications"
       if (typeof args.title !== 'string' || !args.title) {
         throw new GraphQLError('Required field title is missing');
+      } else if (args.price === 0) {
+        throw new GraphQLError('Price can not be 0');
       } else if (typeof args.price !== 'number' || !args.price) {
         throw new GraphQLError('Required field price is missing');
       } else if (typeof args.description !== 'string' || !args.description) {
         throw new GraphQLError('Required field description is missing');
-      } else if (typeof args.userId !== 'number' || !args.userId) {
-        throw new GraphQLError('Required field userId is missing');
       } else if (typeof args.categoryId !== 'number' || !args.categoryId) {
-        throw new GraphQLError('Required field categoryId is missing');
+        throw new GraphQLError('Required field category is missing');
       }
       return await createListing(
         args.title,
@@ -330,6 +367,81 @@ const resolvers = {
         args.userId,
         args.categoryId,
       );
+    },
+
+    // // Update Listing Title By ID
+    updateListingTitleById: async (
+      parent: null,
+      args: { id: string; title: string },
+      // context: FakeAdminUserContext,
+    ) => {
+      // if (!context.isAdmin) {
+      //   throw new GraphQLError('Unauthorized operation');
+      // }
+      return await updateListingTitleById(parseInt(args.id), args.title);
+    },
+
+    // // Update Listing Image By ID
+    updateListingImageByListingId: async (
+      parent: null,
+      args: { id: string; image: string },
+      // context: FakeAdminUserContext,
+    ) => {
+      // if (!context.isAdmin) {
+      //   throw new GraphQLError('Unauthorized operation');
+      // }
+      return await updateListingImageByListingId(parseInt(args.id), args.image);
+    },
+
+    // // Update Listing By ID
+    updateListingById: async (
+      parent: null,
+      args: {
+        id: string;
+        title: string;
+        price: number;
+        description: string;
+        image: string;
+        updatedAt: Date;
+        categoryId: number;
+        statusId: number;
+      },
+    ) => {
+      if (typeof args.title !== 'string' || !args.title || args.title === '') {
+        throw new GraphQLError('Required field title is missing');
+      } else if (typeof args.price !== 'number' || !args.price) {
+        throw new GraphQLError('Required field price is missing');
+      } else if (
+        typeof args.description !== 'string' ||
+        !args.description ||
+        args.description === ''
+      ) {
+        throw new GraphQLError('Required field description is missing');
+      } else if (args.price === 0) {
+        throw new GraphQLError('Price can not be 0');
+      }
+      return await updateListingById(
+        parseInt(args.id),
+        args.title,
+        args.price,
+        args.description,
+        args.image,
+        args.updatedAt,
+        args.categoryId,
+        args.statusId,
+      );
+    },
+
+    // // Delete Listing By ID
+    deleteListingById: async (
+      parent: null,
+      args: { id: string },
+      // context: FakeAdminUserContext,
+    ) => {
+      // if (!context.isAdmin) {
+      //   throw new GraphQLError('Unauthorized operation');
+      // }
+      return await deleteListingById(parseInt(args.id), args.title);
     },
 
     // Role
