@@ -24,9 +24,11 @@ export default function Categories() {
   const categories: Category[] = data.categories;
 
   return (
-    <section className="mx-2 sm:mx-8 lg:mx-24 2xl:mx-40">
-      <h1 className="text-center text-3xl mt-6">Categories</h1>
-      <div className="grid grid-cols-10 pt-4">
+    <div>
+      <h1 className="text-center sm:text-3xl md:text-4xl lg:text-5xl my-6">
+        Categories
+      </h1>
+      <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
         {categories.map((category: Category) => {
           return (
             <SingleCategory
@@ -41,6 +43,6 @@ export default function Categories() {
       <Link className="btn btn-info" href="/categories/admin">
         Manage Categories
       </Link>
-    </section>
+    </div>
   );
 }

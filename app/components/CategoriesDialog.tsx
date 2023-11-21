@@ -19,23 +19,36 @@ export default function CategoriesDialog({
   const { data } = useSuspenseQuery<CategoryResponse>(getCategories);
   // console.log('data: ', data);
   const categories = data.categories;
-  // console.log('categories: ', categories);
-
-  // console.log('Props: categoryId: ', categoryId);
-
+  console.log('categories: ', categories);
   return (
     <>
       <button
-        className="btn btn-outline btn-primary text-white font-bold py-2 px-4 w-1/5"
+        className="btn btn-primary text-white font-bold py-2 px-4 sm:w-full md:w-3/4 lg:w-1/2 xl:w-2/5 2xl:w-1/4 mb-2"
         onClick={() => document.getElementById('my_modal_1').showModal()}
       >
-        Show Categories
+        Choose Category
       </button>
       <dialog id="my_modal_1" className="modal">
         <div className="modal-box">
           <h3 className="font-bold text-lg">Categories</h3>
           <p className="py-3">Please choose a category:</p>
           {categories.map((category) => {
+            console.log(
+              'inside category.map -> value of category.id: ',
+              category.id,
+            );
+            console.log(
+              'inside category.map -> typeof category.id: ',
+              typeof category.id,
+            );
+            console.log(
+              'inside category.map -> value of categoryId ',
+              categoryId,
+            );
+            console.log(
+              'inside category.map -> typeof categoryId ',
+              typeof categoryId,
+            );
             return (
               <div
                 className="flex align-baseline py-1"
@@ -44,12 +57,14 @@ export default function CategoriesDialog({
                 <input
                   type="radio"
                   name="radio-2"
+                  value={category.id}
                   className="radio radio-primary mr-2"
+                  checked={Number(category.id) === Number(categoryId)}
                   onChange={(e) => {
                     console.log(
                       `Category inside dialog with id ${category.id} has been checked`,
                     );
-                    setCategoryId(parseInt(category.id));
+                    setCategoryId(parseInt(e.target.value));
                     console.log(`Value inside categoryId: `, categoryId);
                   }}
                 />
