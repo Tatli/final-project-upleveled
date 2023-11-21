@@ -3,7 +3,6 @@ import { cookies } from 'next/headers';
 // import Image from 'next/image';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { getClient } from '../../util/apolloClient';
 import { CategoryResponse } from '../../util/types';
 import Categories from '../components/Categories';
 
@@ -13,18 +12,6 @@ import Categories from '../components/Categories';
 // };
 
 export default async function CategoriesPage() {
-  const { data } = await getClient().query<CategoryResponse>({
-    query: gql`
-      query GetCategories {
-        categories {
-          id
-          name
-          image
-        }
-      }
-    `,
-  });
-
   // const fakeSessionToken = cookies().get('fakeSession');
 
   // const { user } = await getClient().query<LoggedInUserResponse>({

@@ -19,7 +19,7 @@ export default function SingleCategory({
   });
 
   return (
-    <Link href={`/categories/${id}`} className="col-span-2 m-2 text-center">
+    <Link href={`/categories/${id}`} className="m-2 text-center">
       <img
         className="border-4 border-white hover:border-primary rounded-md"
         src={url}

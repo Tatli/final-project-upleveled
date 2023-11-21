@@ -1,12 +1,12 @@
-import { getCldImageUrl } from 'next-cloudinary';
-import Categories from './components/Categories';
+// import Categories from './components/Categories';
+import DisplayNewestListings from './components/DisplayNewestListings';
 import Hero from './components/Hero';
 
 export default function Home() {
   return (
     <main>
       <Hero />
-      <Categories />
+      <DisplayNewestListings />
     </main>
   );
 }

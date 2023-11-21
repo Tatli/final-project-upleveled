@@ -25,15 +25,13 @@ export default async function Listings() {
   return (
     <section className="mx-2 sm:mx-8 lg:mx-24 2xl:mx-40">
       <div className="grid grid-cols-12">
-        <div className="col-span-1" />
-        <div className="col-span-10">
+        <div className="col-span-12">
           <h1 className="text-2xl mx-auto">Your Listings</h1>
 
-          <div className="grid grid-cols-2">
+          <div className="grid md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
             <DisplayUserListings loggedInUserId={loggedInUserId} />
           </div>
         </div>
-        <div className="col-span-1" />
       </div>
     </section>
   );
