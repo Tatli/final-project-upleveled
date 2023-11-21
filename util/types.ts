@@ -56,6 +56,13 @@ export type Listing = {
   categoryName: number | null;
   username: number | null;
   statusName: number | null;
+  userImage: string;
+  userAddress: string | null;
+  userPostalCode: string | null;
+  userCity: string | null;
+  userCountry: string | null;
+  userPhone: string | null;
+  userRegistrationDate: string | null;
 };
 
 export type CategoryResponse = {

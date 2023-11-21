@@ -6,7 +6,8 @@ export async function up(sql: Sql) {
     VALUES
     ('Active'),
     ('Sold'),
-    ('Inactive')
+    ('Inactive'),
+    ('Expired')
 `;
 }
 

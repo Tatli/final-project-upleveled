@@ -9,6 +9,25 @@ export const getListings = cache(async () => {
   return listings;
 });
 
+export const getListingsSortedByCreatedAt = cache(async () => {
+  const listings = await sql<Listing[]>`
+SELECT
+  listings.*,
+  categories.name AS category_name,
+  users.username AS username,
+  users.image AS user_image,
+  status.name AS status_name
+FROM
+  listings
+INNER JOIN categories ON categories.id = listings.category_id
+INNER JOIN users ON users.id = listings.user_id
+INNER JOIN status ON status.id = listings.status_id
+WHERE status.id = 1
+ORDER BY created_at DESC;
+ `;
+  return listings;
+});
+
 export const getListingById = cache(async (id: number) => {
   const [listing] = await sql<Listing[]>`
     SELECT
@@ -39,6 +58,7 @@ SELECT
   listings.*,
   categories.name AS category_name,
   users.username AS username,
+  users.image AS user_image,
   status.name AS status_name
 FROM
   listings
@@ -58,6 +78,13 @@ SELECT
   listings.*,
   categories.name AS category_name,
   users.username AS username,
+  users.image AS user_image,
+  users.address AS user_address,
+  users.postal_code AS user_postal_code,
+  users.city AS user_city,
+  users.country AS user_country,
+  users.phone AS user_phone,
+  users.registration_date AS user_registration_date,
   status.name AS status_name
 FROM
   listings
@@ -66,6 +93,34 @@ INNER JOIN users ON users.id = listings.user_id
 INNER JOIN status ON status.id = listings.status_id
 WHERE
     listings.id = ${listingId};
+  `;
+    return listing;
+  },
+);
+
+export const getActiveListingsByCategoryIdSortedByCreatedAt = cache(
+  async (categoryId: number) => {
+    const listing = await sql<Listing[]>`
+SELECT
+  listings.*,
+  categories.name AS category_name,
+  users.username AS username,
+  users.image AS user_image,
+  users.address AS user_address,
+  users.postal_code AS user_postal_code,
+  users.city AS user_city,
+  users.country AS user_country,
+  users.phone AS user_phone,
+  users.registration_date AS user_registration_date,
+  status.name AS status_name
+FROM
+  listings
+INNER JOIN categories ON categories.id = listings.category_id
+INNER JOIN users ON users.id = listings.user_id
+INNER JOIN status ON status.id = listings.status_id
+WHERE
+    listings.category_id = ${categoryId}
+    AND status.id = 1;
   `;
     return listing;
   },
@@ -99,8 +154,9 @@ export const updateListingById = cache(
     price: number,
     description: string,
     image: string,
-    categoryId: string,
-    statusId: string,
+    updatedAt: Date,
+    categoryId: number,
+    statusId: number,
   ) => {
     const [listing] = await sql<Listing[]>`
       UPDATE listings
@@ -109,8 +165,9 @@ export const updateListingById = cache(
         price = ${price},
         description = ${description},
         image = ${image},
-        categoryId = ${categoryId},
-        statusId = ${statusId},
+        updated_at = ${updatedAt},
+        category_id = ${categoryId},
+        status_id = ${statusId}
       WHERE
         id = ${id}
         RETURNING *
@@ -146,3 +203,33 @@ export const getListingByListingTitle = cache(async (title: string) => {
   `;
   return listing;
 });
+
+export const updateListingTitleById = cache(
+  async (id: number, title: string) => {
+    const [listing] = await sql<Listing[]>`
+      UPDATE listings
+      SET
+      title = ${title}
+      WHERE
+        id = ${id}
+        RETURNING *
+    `;
+
+    return listing;
+  },
+);
+
+export const updateListingImageByListingId = cache(
+  async (id: number, image: string) => {
+    const [listing] = await sql<Listing[]>`
+      UPDATE listings
+      SET
+      image = ${image}
+      WHERE
+        id = ${id}
+        RETURNING *
+    `;
+
+    return listing;
+  },
+);

@@ -26,12 +26,17 @@ export const getUserById = cache(async (id: number) => {
 });
 
 export const createUser = cache(
-  async (username: string, email: string, password_hash: string) => {
+  async (
+    username: string,
+    email: string,
+    password_hash: string,
+    image: string,
+  ) => {
     const [user] = await sql<User[]>`
       INSERT INTO users
-        (username, email, password_hash)
+        (username, email, password_hash, image)
       VALUES
-        (${username}, ${email}, ${password_hash})
+        (${username}, ${email}, ${password_hash}, ${image})
       RETURNING *
     `;
 
@@ -54,6 +59,7 @@ export const updateUserById = cache(
     passwordHash: string,
     phone: string,
     roleId: number,
+    image: string,
   ) => {
     const [user] = await sql<User[]>`
       UPDATE users
@@ -69,7 +75,23 @@ export const updateUserById = cache(
         email = ${email},
         password_hash = ${passwordHash},
         phone = ${phone},
-        role_id = ${roleId}
+        role_id = ${roleId},
+        image = ${image}
+      WHERE
+        id = ${id}
+        RETURNING *
+    `;
+
+    return user;
+  },
+);
+
+export const updateUserImageByUserId = cache(
+  async (id: number, image: string) => {
+    const [user] = await sql<User[]>`
+      UPDATE users
+      SET
+        image = ${image}
       WHERE
         id = ${id}
         RETURNING *

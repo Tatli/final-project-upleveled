@@ -16,7 +16,9 @@ import {
 import {
   createListing,
   deleteListingById,
+  getActiveListingsByCategoryIdSortedByCreatedAt,
   getListings,
+  getListingsSortedByCreatedAt,
   getUserListingByListingIdJoined,
   getUserListingsByUserIdJoined,
   updateListingById,
@@ -89,6 +91,13 @@ const typeDefs = gql`
     categoryName: String
     username: String
     statusName: String
+    userImage: String
+    userAddress: String
+    userPostalCode: String
+    userCity: String
+    userCountry: String
+    userPhone: String
+    userRegistrationDate: Date
   }
   type Role {
     id: ID!
@@ -111,6 +120,8 @@ const typeDefs = gql`
     listings: [Listing!]!
     userListingsByUserIdJoined(id: ID!): [Listing!]!
     userListingByListingIdJoined(id: ID!): [Listing!]!
+    getActiveListingsByCategoryIdSortedByCreatedAt(id: ID!): [Listing!]!
+    getListingsSortedByCreatedAt: [Listing!]!
   }
 
   type Mutation {
@@ -155,7 +166,12 @@ const typeDefs = gql`
     ## Login
     login(username: String!, passwordHash: String!): User
     ## Register
-    register(username: String!, passwordHash: String!, email: String!): User
+    register(
+      username: String!
+      passwordHash: String!
+      email: String!
+      image: String!
+    ): User
 
     # Listing
     ## Create
@@ -217,6 +233,10 @@ const resolvers = {
       return await getListings();
     },
 
+    getListingsSortedByCreatedAt: async () => {
+      return await getListingsSortedByCreatedAt();
+    },
+
     getStatuses: async () => {
       return await getStatuses();
     },
@@ -230,6 +250,13 @@ const resolvers = {
       args: { id: string },
     ) => {
       return await getUserListingByListingIdJoined(parseInt(args.id));
+    },
+
+    getActiveListingsByCategoryIdSortedByCreatedAt: async (
+      parent: null,
+      args: { id: string },
+    ) => {
+      return await getActiveListingsByCategoryIdSortedByCreatedAt(parseInt(args.id));
     },
 
     loggedInUserByUsername: async (
@@ -411,14 +438,14 @@ const resolvers = {
         throw new GraphQLError('Required field title is missing');
       } else if (typeof args.price !== 'number' || !args.price) {
         throw new GraphQLError('Required field price is missing');
+      } else if (args.price === 0) {
+        throw new GraphQLError('Price can not be 0');
       } else if (
         typeof args.description !== 'string' ||
         !args.description ||
         args.description === ''
       ) {
         throw new GraphQLError('Required field description is missing');
-      } else if (args.price === 0) {
-        throw new GraphQLError('Price can not be 0');
       }
       return await updateListingById(
         parseInt(args.id),
@@ -528,7 +555,12 @@ const resolvers = {
 
     register: async (
       parent: null,
-      args: { username: string; passwordHash: string; email: string },
+      args: {
+        username: string;
+        passwordHash: string;
+        email: string;
+        image: string;
+      },
     ) => {
       // Indicate "location"
       console.log('Inside register mutation');
@@ -546,13 +578,19 @@ const resolvers = {
       console.log('username in register mutation: ', args.username);
       console.log('passwordHash in register mutation: ', args.passwordHash);
       console.log('email in register mutation: ', args.email);
+      console.log('image in register mutation: ', args.image);
 
       const user = await getUserByUsername(args.username);
 
       // Check if user with given username already exists
       if (args.username !== user?.username) {
         // Create user
-        await createUser(args.username, args.email, args.passwordHash);
+        await createUser(
+          args.username,
+          args.email,
+          args.passwordHash,
+          args.image,
+        );
         // Set session cookie
         console.log(
           'Setting cookie fakeSession with username: ',
