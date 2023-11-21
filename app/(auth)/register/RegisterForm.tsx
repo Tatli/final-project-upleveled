@@ -5,11 +5,22 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 const registerMutation = gql`
-  mutation Register($username: String!, $password: String!, $email: String!) {
-    register(username: $username, passwordHash: $password, email: $email) {
+  mutation Register(
+    $username: String!
+    $password: String!
+    $email: String!
+    $image: String!
+  ) {
+    register(
+      username: $username
+      passwordHash: $password
+      email: $email
+      image: $image
+    ) {
       id
       username
       email
+      image
     }
   }
 `;
@@ -18,6 +29,7 @@ export default function RegisterForm() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
+  const [image, setImage] = useState('users/default-avatar');
   const [onError, setOnError] = useState('');
   const [newsletter, setNewsletter] = useState(false);
   const [acceptAgreements, setAcceptAgreements] = useState(false);
@@ -29,12 +41,14 @@ export default function RegisterForm() {
       username,
       password,
       email,
+      image,
     },
 
     onError: (error) => {
       console.log('username in onError: ', username);
       console.log('password in onError: ', password);
       console.log('email in onError: ', email);
+      console.log('image in onError: ', image);
       console.log('error: ', error.message);
       setOnError(error.message);
     },
@@ -45,6 +59,7 @@ export default function RegisterForm() {
       console.log('username in onCompleted: ', username);
       console.log('password in onCompleted: ', password);
       console.log('email in onCompleted: ', email);
+      console.log('image in onCompleted: ', email);
       setOnCompleted(onCompleted.message);
       router.refresh();
     },
