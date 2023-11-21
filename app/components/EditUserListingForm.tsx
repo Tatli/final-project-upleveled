@@ -1,76 +1,131 @@
-'use client';
 import 'react-toastify/dist/ReactToastify.css';
-import { gql, useMutation, useQuery } from '@apollo/client';
+import { ApolloQueryResult, gql, useMutation } from '@apollo/client';
+import { useSuspenseQuery } from '@apollo/experimental-nextjs-app-support/ssr';
 import { CldImage, CldUploadButton } from 'next-cloudinary';
-import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import { useContext, useState } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
+import { Listing, Status } from '../../util/types';
 import CategoriesDialog from './CategoriesDialog';
+import { EditUserListingContext } from './EditUserListing';
 
-const createListing = gql`
-  mutation CreateListing(
+const getStatuses = gql`
+  query GetStatuses {
+    getStatuses {
+      id
+      name
+    }
+  }
+`;
+
+const updateListingById = gql`
+  mutation UpdateListingById(
+    $id: ID!
     $title: String!
     $price: Int!
     $description: String!
     $image: String
-    $userId: Int
+    $updatedAt: Date
     $categoryId: Int
+    $statusId: Int
   ) {
-    createListing(
+    updateListingById(
+      id: $id
       title: $title
       price: $price
       description: $description
       image: $image
-      userId: $userId
+      updatedAt: $updatedAt
       categoryId: $categoryId
+      statusId: $statusId
     ) {
       id
       title
       price
-      description
       image
+      description
+      views
+      createdAt
+      updatedAt
       userId
+      statusId
       categoryId
-    }
-  }
-`;
-
-const getUser = gql`
-  query User($loggedInUserId: ID!) {
-    user(id: $loggedInUserId) {
-      id
+      categoryName
       username
-      email
-      address
-      postalCode
-      city
-      country
-      phone
+      statusName
+    }
+  }
+`;
+const updateListingImageByListingId = gql`
+  mutation UpdateListingImageByListingId($id: ID!, $image: String!) {
+    updateListingImageByListingId(id: $id, image: $image) {
+      id
+      image
     }
   }
 `;
 
-export default function CreateNewListing({
-  loggedInUserId,
-}: {
-  loggedInUserId: number;
-}) {
-  const [title, setTitle] = useState('');
-  const [price, setPrice] = useState(0);
-  const [description, setDescription] = useState('');
-  const [image, setImage] = useState('listings/default-listing-placeholder');
-  const [categoryId, setCategoryId] = useState(0);
-  const [onError, setOnError] = useState('');
-  const router = useRouter();
+function renderListingStatus(status) {
+  switch (status) {
+    case 'Active':
+      return <p>🟢 Active</p>;
+    case 'Sold':
+      return <p>🔴 Sold</p>;
+    case 'Inactive':
+      return <p>⚫ Inactive</p>;
+    default:
+      return <p>Status Unknown</p>;
+  }
+}
 
-  const [handleCreateListing] = useMutation(createListing, {
+export default function EditUserListingForm({ listing }: { listing: Listing }) {
+  const [title, setTitle] = useState(listing.title || '');
+  const [price, setPrice] = useState(listing.price);
+  const [description, setDescription] = useState(listing.description);
+  const [image, setImage] = useState(listing.image);
+  const [updatedAt, setUpdatedAt] = useState(new Date().toISOString());
+  const [statusId, setStatusId] = useState(listing.statusId);
+  const [categoryId, setCategoryId] = useState(listing.categoryId);
+  const [categoryName, setCategoryName] = useState(listing.categoryName);
+  const [onError, setOnError] = useState('');
+
+  const { data: dataStatuses } = useSuspenseQuery<Status[]>(getStatuses);
+  const statuses = dataStatuses.getStatuses;
+
+  const { refetch } = useContext(EditUserListingContext);
+  const notify = () => toast('Wow so easy!');
+
+  const [handleUpdateListingImageByListingId] = useMutation(
+    updateListingImageByListingId,
+    {
+      variables: {
+        id: listing.id,
+        image,
+      },
+
+      onError: (error) => {
+        setOnError(error.message);
+        return;
+      },
+
+      onCompleted: async () => {
+        console.log(image);
+        setOnError('');
+        toast.success('Listing image updated successfully');
+        await refetch();
+      },
+    },
+  );
+
+  const [handleUpdateListing] = useMutation(updateListingById, {
     variables: {
+      id: listing.id,
       title,
       price,
       description,
       image,
-      userId: parseInt(loggedInUserId),
+      updatedAt,
       categoryId,
+      statusId,
     },
 
     onError: (error) => {
@@ -81,52 +136,32 @@ export default function CreateNewListing({
 
     onCompleted: async () => {
       setOnError('');
-      setTitle('');
-      setPrice(0);
-      setCategoryId(0);
-      setDescription('');
-      setImage('listings/default-listing-placeholder');
-      toast.success('Listing created successfully');
-      router.refresh();
+      toast.success('Listing updated successfully');
+      await refetch();
     },
   });
 
-  const { data, loading, error } = useQuery(getUser, {
-    variables: { loggedInUserId },
-  });
-
-  if (loading) {
-    <div>User information loading...</div>;
-  }
-  if (error) {
-    <div>{error.message}</div>;
-  }
-
   return (
-    <div className="sm:col-span-10 xl:col-span-8 2xl:col-span-6">
+    <>
       <ToastContainer />
-      <h1 className="text-5xl pb-4">Create a new listing</h1>
-      <hr />
-      <br />
-      <h2 className="text-3xl pb-2">Listing details</h2>
       <div className="form-control w-full gap-1">
+        {/* Title */}
         <label htmlFor="title">
-          <span className="label-text font-medium text-base">Title</span>
+          <span className="label-text font-bold text-base">Title</span>
         </label>
         <input
           value={title}
           id="title"
           onChange={(e) => setTitle(e.currentTarget.value)}
-          placeholder="e.g. Levi's 501 jeans, black, size 32"
-          className="input input-bordered w-full mb-2"
+          className="input input-bordered w-full"
         />
-        <span className="text-sm text-slate-500">
+        <span className="text-sm text-slate-500 mb-2">
           ℹ A meaningful title helps searchers find your ad faster and increases
           your chances of making a sale.
         </span>
-
+        {/* Price */}
         <label htmlFor="price">
-          <span className="label-text font-medium text-base ">Price</span>
+          <span className="label-text font-bold text-base">Price</span>
         </label>
         <div className="join">
           <button className="btn join-item rounded-r-full ">$</button>
@@ -135,41 +170,75 @@ export default function CreateNewListing({
             type="number"
             id="price"
             min={1}
-            className="input input-bordered sm:w-full lg:w-1/2 2xl:w-1/3 mb-2"
+            className="input input-bordered w-1/3 mb-2"
             onChange={(e) => {
               setPrice(Number(e.target.value));
-              console.log('price: ', price);
             }}
           />
         </div>
-
+        {/* Category */}
         <label htmlFor="category">
-          <span id="category" className="label-text font-medium text-base">
+          <span id="category" className="label-text font-bold text-base">
             Category
           </span>
         </label>
+        <p className="text-sm font-bold">New Category: </p>
         <CategoriesDialog
           categoryId={categoryId}
           setCategoryId={setCategoryId}
         />
+        <p className="text-sm">
+          <span className="font-medium">Current Category: </span>{' '}
+          {listing.categoryName}
+        </p>
+        {/* Description */}
         <label htmlFor="description">
-          <span id="description" className="label-text font-medium text-base">
+          <span id="description" className="label-text font-bold text-base">
             Description
           </span>
         </label>
         <textarea
           value={description}
-          className="textarea textarea-primary"
+          className="textarea textarea-primary mb-2"
           onChange={(e) => {
             setDescription(e.currentTarget.value);
             console.log('description:', description);
           }}
           placeholder="e.g. dimensions, size, reasons for sale, defects/defects if any."
         />
-
-        <label htmlFor="image">
-          <span className="label-text font-medium text-base ">Image</span>
+        {/* Status */}
+        <label htmlFor="description">
+          <span id="description" className="label-text font-bold text-base">
+            Status
+          </span>
         </label>
+        <p className="text-sm font-bold">New Status: </p>
+        <select
+          id="profileType"
+          className="select select-bordered w-1/6 mb-2"
+          value={statusId}
+          onChange={(e) => {
+            setStatusId(parseInt(e.currentTarget.value));
+          }}
+        >
+          {statuses.map((status) => {
+            return (
+              <option key={`role-id-${status.id}`} value={status.id}>
+                {status.name}
+              </option>
+            );
+          })}
+        </select>
+        <div className="text-sm">
+          <span className="font-medium">
+            Current Status: {renderListingStatus(listing.statusName)}
+          </span>
+        </div>
+        {/* Image */}
+        <label htmlFor="image">
+          <span className="label-text font-bold text-base ">Image</span>
+        </label>
+        {/* Consider scaling image relative to parent anchor element https://stackoverflow.com/questions/19192892/css-how-can-i-set-image-size-relative-to-parent-height */}
         <CldImage
           width="300"
           height="150"
@@ -178,29 +247,36 @@ export default function CreateNewListing({
           alt="Description of my image"
         />
         <CldUploadButton
-          className="btn btn-primary text-white font-bold py-2 px-4 sm:w-full md:w-2/4 lg:w-1/4 xl:w-2/6 2xl:w-1/6 "
+          className=" bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 w-1/4"
           onError={(error) => {
             console.log(error);
           }}
-          onSuccess={(result) => {
+          onSuccess={async (result) => {
             if (
               typeof result.info === 'object' &&
               'public_id' in result.info &&
               result.info.public_id
             ) {
+              console.log('inside: ', result.info.public_id.toString());
               setImage(result.info.public_id.toString());
+              console.log('image inside cld upload onSuccess: ', image);
             }
           }}
           uploadPreset="uwugz2aw"
         />
+        <button
+          className="btn btn-primary text-white font-bold py-2 px-4 w-1/4"
+          onClick={async () => {
+            await handleUpdateListingImageByListingId();
+          }}
+        >
+          Update
+        </button>
         <span className="text-sm text-slate-500">
           ℹ Images help potential customers better imagine your product
-        </span>
-
+        </span>{' '}
         <br />
-
         <h2 className="text-3xl my-2">Contact and place of sale</h2>
-
         <div className="flex gap-2 flex-col">
           <div className="grid grid-cols-2">
             <div className="col-span-1 py-2 px-1">
@@ -263,13 +339,14 @@ export default function CreateNewListing({
         </div>
         <button
           onClick={async () => {
-            await handleCreateListing();
+            setUpdatedAt(new Date().toISOString());
+            await handleUpdateListing();
           }}
           className="btn btn-primary my-4 text-white"
         >
-          Publish
+          Save
         </button>
       </div>
-    </div>
+    </>
   );
 }

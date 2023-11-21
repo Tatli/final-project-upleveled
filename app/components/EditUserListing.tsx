@@ -1,205 +1,54 @@
 'use client';
-import { gql, useMutation } from '@apollo/client';
-import { CldUploadButton } from 'next-cloudinary';
-import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
-import Categories from './CategoriesDialog';
+import { gql } from '@apollo/client';
+import { useSuspenseQuery } from '@apollo/experimental-nextjs-app-support/ssr';
+import React, { createContext, useState } from 'react';
+import { Listing } from '../../util/types';
+import EditUserListingForm from './EditUserListingForm';
 
-const createListing = gql`
-  mutation CreateListing(
-    $title: String!
-    $price: Int!
-    $description: String!
-    $image: String
-    $userId: Int
-    $categoryId: Int
-  ) {
-    createListing(
-      title: $title
-      price: $price
-      description: $description
-      image: $image
-      userId: $userId
-      categoryId: $categoryId
-    ) {
+const getUserListingByListingIdJoined = gql`
+  query UserListingByListingIdJoined($listingId: ID!) {
+    userListingByListingIdJoined(id: $listingId) {
       id
       title
       price
-      description
       image
+      description
+      views
+      createdAt
+      updatedAt
       userId
+      statusId
       categoryId
+      categoryName
+      username
+      statusName
     }
   }
 `;
 
+const EditUserListingContext = createContext({ refetch: () => {} });
+
 export default function EditUserListing({ listingId }: { listingId: number }) {
-  // Get User of listing
+  const { data, refetch } = useSuspenseQuery<Listing>(
+    getUserListingByListingIdJoined,
+    {
+      variables: { listingId },
+    },
+  );
+
+  console.log('data inside EditUserListing: ', data);
+  const listing: Listing = data.userListingByListingIdJoined[0];
 
   return (
-    <div className="sm:col-span-10 xl:col-span-8 2xl:col-span-6">
-      <h1 className="text-5xl pb-4">Edit Listing</h1>
-      <hr />
-      <br />
-      <h2 className="text-3xl pb-2">Listing details</h2>
-      <div className="form-control w-full gap-1">
-        {/* Title */}
-        <label htmlFor="title">
-          <span className="label-text font-medium text-base">Title</span>
-        </label>
-        <input
-          value={title}
-          id="title"
-          onChange={(e) => setTitle(e.currentTarget.value)}
-          placeholder="e.g. Levi's 501 jeans, black, size 32"
-          className="input input-bordered w-full mb-2"
-        />
-        <span className="text-sm text-slate-500">
-          ℹ A meaningful title helps searchers find your ad faster and increases
-          your chances of making a sale.
-        </span>
-
-        {/* Price */}
-        <label htmlFor="price">
-          <span className="label-text font-medium text-base">Price</span>
-        </label>
-        <div className="join">
-          <button className="btn join-item rounded-r-full ">$</button>
-          <input
-            value={price}
-            type="number"
-            id="price"
-            className="input input-bordered w-1/3 mb-2"
-            onChange={(e) => {
-              setPrice(Number(e.target.value));
-              console.log('price: ', price);
-            }}
-          />
-        </div>
-
-        {/* Category */}
-        <label htmlFor="category">
-          <span id="category" className="label-text font-medium text-base">
-            Category
-          </span>
-        </label>
-        <Categories categoryId={categoryId} setCategoryId={setCategoryId} />
-
-        {/* Description */}
-        <label htmlFor="description">
-          <span id="description" className="label-text font-medium text-base">
-            Description
-          </span>
-        </label>
-        <textarea
-          value={description}
-          className="textarea textarea-primary"
-          onChange={(e) => {
-            setDescription(e.currentTarget.value);
-            console.log('description:', description);
-          }}
-          placeholder="e.g. dimensions, size, reasons for sale, defects/defects if any."
-        />
-
-        {/* Status */}
-        <label htmlFor="description">
-          <span id="description" className="label-text font-medium text-base">
-            Status
-          </span>
-        </label>
-
-        {/* Image */}
-        <label htmlFor="image">
-          <span className="label-text font-medium text-base ">Image</span>
-        </label>
-        <CldUploadButton
-          className=" bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full w-1/4"
-          onError={(error) => {
-            console.log(error);
-          }}
-          onSuccess={(result) => {
-            if (typeof result.info === 'object' && 'public_id' in result.info) {
-              const publicId: string = result.info.public_id as string;
-              console.log('result.info.public_id: ', publicId);
-              setImage(publicId);
-            }
-          }}
-          uploadPreset="uwugz2aw"
-        />
-
+    <EditUserListingContext.Provider value={{ refetch }}>
+      <div className="sm:col-span-10 xl:col-span-8 2xl:col-span-6">
+        <h1 className="text-5xl pb-4">Edit Listing</h1>
+        <hr />
         <br />
-
-        <h2 className="text-3xl my-2">Contact and place of sale</h2>
-
-        <div className="flex gap-2 flex-col">
-          <div className="grid grid-cols-2">
-            <div className="col-span-1 py-2 px-1">
-              <span className="font-medium text-base">Name</span>
-              <p>user.firstname</p>
-            </div>
-
-            <div className="col-span-1 py-2 px-1">
-              <span className="font-medium text-base">Email</span>
-              <p>your@email.xyz</p>
-            </div>
-          </div>
-          <div className="py-2 px-1">
-            <span className="text-sm text-slate-500">
-              ℹ You can change your name and email address in your profile
-              settings
-            </span>
-          </div>
-
-          <label htmlFor="country" className="label">
-            <span className="label-text font-medium text-base">Country</span>
-          </label>
-          <select
-            id="country"
-            className="select select-bordered w-full max-w-xs"
-          >
-            <option>Austria</option>
-            <option>Turkey</option>
-          </select>
-
-          <label htmlFor="street" className="label">
-            <span className="label-text font-medium text-base">Street</span>
-          </label>
-          <input
-            id="street"
-            placeholder="Street name"
-            className="input input-bordered w-full mb-2"
-          />
-
-          <div className="flex gap-2 ">
-            <label htmlFor="postal" className="label">
-              <span className="label-text font-medium text-base">
-                Postal code
-              </span>
-            </label>
-            <input
-              id="postal"
-              placeholder="12345"
-              className="input input-bordered w-full mb-2"
-            />
-            <label htmlFor="location" className="label">
-              <span className="label-text font-medium text-base">Location</span>
-            </label>
-            <input
-              id="location"
-              placeholder="location"
-              className="input input-bordered w-full mb-2"
-            />
-          </div>
-        </div>
-        <button
-          onClick={async () => {
-            await handleCreateListing();
-          }}
-          className="btn btn-primary my-4 text-white"
-        >
-          Publish
-        </button>
+        <h2 className="text-3xl pb-2">Listing details</h2>
+        <EditUserListingForm listing={listing} />
       </div>
-    </div>
+    </EditUserListingContext.Provider>
   );
 }
+export { EditUserListingContext };

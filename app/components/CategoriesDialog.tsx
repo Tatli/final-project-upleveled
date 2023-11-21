@@ -33,22 +33,6 @@ export default function CategoriesDialog({
           <h3 className="font-bold text-lg">Categories</h3>
           <p className="py-3">Please choose a category:</p>
           {categories.map((category) => {
-            console.log(
-              'inside category.map -> value of category.id: ',
-              category.id,
-            );
-            console.log(
-              'inside category.map -> typeof category.id: ',
-              typeof category.id,
-            );
-            console.log(
-              'inside category.map -> value of categoryId ',
-              categoryId,
-            );
-            console.log(
-              'inside category.map -> typeof categoryId ',
-              typeof categoryId,
-            );
             return (
               <div
                 className="flex align-baseline py-1"
