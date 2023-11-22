@@ -10,7 +10,8 @@ import {
 
 function makeClient() {
   const httpLink = new HttpLink({
-    uri: `${process.env.NEXT_PUBLIC_BASE_URL}/api/graphql`,
+    // uri: `${process.env.NEXT_PUBLIC_BASE_URL}/api/graphql`,
+    uri: 'https://upleveled-final-project-tatli.fly.dev/api/graphql',
     fetchOptions: { cache: 'no-store' },
   });
 

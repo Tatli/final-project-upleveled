@@ -14,7 +14,8 @@ export const { getClient } = registerApolloClient(() => {
 
   // Local GraphQL server API Link
   const localLink = new HttpLink({
-    uri: 'http://localhost:3000/api/graphql',
+    uri: 'https://upleveled-final-project-tatli.fly.dev/api/graphql',
+    // uri: 'http://localhost:3000/api/graphql',
     credentials: 'same-origin',
   });
 
