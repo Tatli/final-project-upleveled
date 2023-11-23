@@ -10,10 +10,16 @@ import {
 
 function makeClient() {
   const httpLink = new HttpLink({
-    // uri: `${process.env.NEXT_PUBLIC_BASE_URL}/api/graphql`,
     uri: 'https://upleveled-final-project-tatli.fly.dev/api/graphql',
+    // uri: 'http://localhost:3000/api/graphql',
+    // uri: '/api/graphql',
     fetchOptions: { cache: 'no-store' },
   });
+
+  console.log(
+    'process.env.NEXT_PUBLIC_APOLLO_CLIENT_URI inside apolloClientProvider: ',
+    process.env.NEXT_PUBLIC_APOLLO_CLIENT_URI,
+  );
 
   return new NextSSRApolloClient({
     cache: new NextSSRInMemoryCache(),
