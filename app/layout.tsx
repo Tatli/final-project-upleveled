@@ -5,6 +5,7 @@ import { Inter } from 'next/font/google';
 import { cookies } from 'next/headers';
 import Link from 'next/link';
 import { getClient } from '../util/apolloClient';
+import { checkLogin } from '../util/auth';
 import { LogoutButton } from './(auth)/logout/LogoutButton';
 import { ApolloClientProvider } from './ApolloClientProvider';
 import Footer from './components/Footer';
@@ -21,22 +22,15 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const fakeSessionToken = cookies().get('fakeSession');
+  const sessionToken = cookies().get('sessionToken')?.value;
 
-  const { data } = await getClient().query({
-    query: gql`
-      query LoggedInUser($username: String!) {
-        loggedInUserByUsername(username: $username) {
-          id
-          username
-        }
-      }
-    `,
-    variables: {
-      username: fakeSessionToken?.value || '',
-    },
-  });
+  const loggedInUser =
+    sessionToken &&
+    (await checkLogin(sessionToken).catch((error) => {
+      console.log(error);
+    }));
 
+  console.log('loggedInUser in layout.tsx: ', loggedInUser);
   return (
     <html lang="en" data-theme="corporate">
       <body className={`${inter.className} `}>
@@ -60,7 +54,7 @@ export default async function RootLayout({
                 <li className="border-b-4 border-white hover:border-primary hover:font-medium">
                   <Link href="/categories">Categories</Link>
                 </li>
-                {data.loggedInUserByUsername?.username ? (
+                {loggedInUser ? (
                   <li className="border-b-4 border-white hover:border-primary hover:font-medium mr-4">
                     <LogoutButton />
                   </li>
@@ -75,11 +69,11 @@ export default async function RootLayout({
                   </>
                 )}
 
-                {data.loggedInUserByUsername?.username ? (
+                {loggedInUser ? (
                   <li className="border-b-4 border-white hover:border-primary">
                     <details>
                       <summary className="px-2">
-                        {data.loggedInUserByUsername.username}
+                        {loggedInUser.username}
                       </summary>
                       <ul className="bg-base-100 z-10">
                         <li>

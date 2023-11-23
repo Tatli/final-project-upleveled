@@ -12,7 +12,7 @@ import Categories from '../components/Categories';
 // };
 
 export default async function CategoriesPage() {
-  // const fakeSessionToken = cookies().get('fakeSession');
+  // const sessionToken = cookies().get('sessionToken');
 
   // const { user } = await getClient().query<LoggedInUserResponse>({
   //   query: gql`
@@ -24,7 +24,7 @@ export default async function CategoriesPage() {
   //     }
   //   `,
   //   variables: {
-  //     username: fakeSessionToken?.value || '',
+  //     username: sessionToken?.value || '',
   //   },
   // });
 

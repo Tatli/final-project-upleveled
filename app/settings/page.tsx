@@ -2,45 +2,21 @@ import { gql } from '@apollo/client';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { getClient } from '../../util/apolloClient';
+import { checkLogin } from '../../util/auth';
 import AdminDashboard from './AdminDashboard';
 
 export default async function Settings() {
-  // const [profileType, setProfileType] = useState('private');
-  const fakeSessionToken = cookies().get('fakeSession');
+  const sessionToken = cookies().get('sessionToken')?.value;
 
-  const { data } = await getClient().query({
-    query: gql`
-      query LoggedInUser($username: String!) {
-        loggedInUserByUsername(username: $username) {
-          id
-          username
-        }
-      }
-    `,
-    variables: {
-      username: fakeSessionToken?.value || '',
-    },
-  });
+  const loggedInUser =
+    sessionToken &&
+    (await checkLogin(sessionToken).catch((error) => {
+      console.log(error);
+    }));
 
-  if (!data.loggedInUserByUsername) {
+  if (!loggedInUser) {
     redirect('/login');
   }
 
-  const user = data.loggedInUserByUsername;
-
-  // const { roleData } = await getClient().query({
-  //   query: gql`
-  //     query role($id: ID!) {
-  //       role(id: $id) {
-  //         id
-  //         name
-  //       }
-  //     }
-  //   `,
-  //   variables: {
-  //     id: user.id || '',
-  //   },
-  // });
-
-  return <AdminDashboard userId={user.id} />;
+  return <AdminDashboard userId={loggedInUser.id} />;
 }

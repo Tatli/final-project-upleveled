@@ -4,7 +4,11 @@ export type CreateUserArgs = {
   passwordHash: string;
   roleId: number;
 };
-
+export type UserJwtPayload = {
+  id: string;
+  username: string;
+  email: string;
+};
 export type CreateRoleArgs = {
   name: string;
 };
@@ -23,10 +27,15 @@ export type Category = {
   name: string;
   image: string;
 };
+export type LoginResponse = {
+  token: string;
+  user: User;
+};
 
 export type User = {
   id: number;
   username: string | null;
+  passwordHash: string;
   firstName: string | null;
   lastName: string | null;
   birthDate: Date | null;
@@ -35,10 +44,28 @@ export type User = {
   city: string | null;
   country: string | null;
   email: string | null;
-  passwordHash: string;
   phone: string | null;
   image: string | null;
   roleId: number | null;
+};
+
+export type UserSuspenseQuery = {
+  user: {
+    id: number;
+    username: string | null;
+    firstName: string | null;
+    lastName: string | null;
+    birthDate: Date | null;
+    address: string | null;
+    postalCode: string | null;
+    city: string | null;
+    country: string | null;
+    email: string | null;
+    passwordHash: string;
+    phone: string | null;
+    image: string | null;
+    roleId: number | null;
+  };
 };
 
 export type Listing = {

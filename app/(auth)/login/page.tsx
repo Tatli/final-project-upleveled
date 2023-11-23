@@ -4,9 +4,9 @@ import React from 'react';
 import LoginForm from './LoginForm';
 
 export default function LoginPage() {
-  const fakeSessionToken = cookies().get('fakeSession');
+  const sessionToken = cookies().get('sessionToken');
 
-  if (fakeSessionToken?.value) {
+  if (sessionToken?.value) {
     redirect('/');
   }
   return <LoginForm />;

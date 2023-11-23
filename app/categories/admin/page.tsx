@@ -5,7 +5,7 @@ import { getClient } from '../../../util/apolloClient';
 import AdminDashboard from './AdminDashboard';
 
 export default async function AdminPage() {
-  const fakeSessionToken = cookies().get('fakeSession');
+  const sessionToken = cookies().get('sessionToken');
 
   const { data } = await getClient().query({
     query: gql`
@@ -17,7 +17,7 @@ export default async function AdminPage() {
       }
     `,
     variables: {
-      username: fakeSessionToken?.value || '',
+      username: sessionToken?.value || '',
     },
   });
 

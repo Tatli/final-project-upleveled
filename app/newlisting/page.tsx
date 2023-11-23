@@ -3,30 +3,23 @@ import { gql } from '@apollo/client';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { getClient } from '../../util/apolloClient';
+import { checkLogin } from '../../util/auth';
 import CreateNewListing from '../components/CreateNewListing';
 
 export default async function Settings() {
-  const fakeSessionToken = cookies().get('fakeSession');
+  const sessionToken = cookies().get('sessionToken')?.value;
 
-  const { data } = await getClient().query({
-    query: gql`
-      query LoggedInUser($username: String!) {
-        loggedInUserByUsername(username: $username) {
-          id
-          username
-        }
-      }
-    `,
-    variables: {
-      username: fakeSessionToken?.value || '',
-    },
-  });
+  const loggedInUser =
+    sessionToken &&
+    (await checkLogin(sessionToken).catch((error) => {
+      console.log(error);
+    }));
 
-  if (!data.loggedInUserByUsername) {
+  if (!loggedInUser) {
     redirect('/login');
   }
 
-  const loggedInUserId: number = data.loggedInUserByUsername.id;
+  const loggedInUserId: number = loggedInUser?.id;
   return (
     <div className="grid grid-cols-12 pt-16">
       <div className="sm:col-span-1 xl:col-span-2 2xl:col-span-3" />

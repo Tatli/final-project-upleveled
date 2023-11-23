@@ -15,9 +15,9 @@ CREATE TABLE users (
     city VARCHAR(150) ,
     country VARCHAR(150) ,
     email VARCHAR(255) NOT NULL,
-    password_hash VARCHAR(50) NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
     phone VARCHAR(30) ,
-    image VARCHAR(255) ,
+    image VARCHAR(255) DEFAULT 'users/default-avatar',
     registration_date timestamp DEFAULT NOW(),
     role_id integer DEFAULT 1 REFERENCES roles(id) ON DELETE SET NULL
 );

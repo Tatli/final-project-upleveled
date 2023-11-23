@@ -1,7 +1,7 @@
 import { gql, useMutation } from '@apollo/client';
 import { useSuspenseQuery } from '@apollo/experimental-nextjs-app-support/ssr';
 import { CldImage, CldUploadButton } from 'next-cloudinary';
-import React, { useState } from 'react';
+import React, { use, useEffect, useLayoutEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { Role, User } from '../../util/types';
 
@@ -35,7 +35,7 @@ const updateUserById = gql`
     $city: String
     $country: String
     $email: String
-    $passwordHash: String
+    $password: String
     $phone: String
     $roleId: Int
   ) {
@@ -50,7 +50,7 @@ const updateUserById = gql`
       city: $city
       country: $country
       email: $email
-      passwordHash: $passwordHash
+      password: $password
       phone: $phone
       roleId: $roleId
     ) {
@@ -82,6 +82,7 @@ const updateUserImageByUserId = gql`
 
 export default function UserInfoEdit({ user }: { user: User }) {
   const formattedBirthDate = user.birthDate?.toString().split('T')[0];
+
   console.log('user.image inside UserInfoEdit', user.image);
 
   const [username, setUsername] = useState(user.username);
@@ -93,17 +94,25 @@ export default function UserInfoEdit({ user }: { user: User }) {
   const [country, setCountry] = useState(user.country);
   const [postalCode, setPostalCode] = useState(user.postalCode);
   const [email, setEmail] = useState(user.email);
-  const [passwordHash, setPasswordHash] = useState(user.passwordHash);
+  const [password, setPassword] = useState('');
   const [phone, setPhone] = useState(user.phone);
-  const [roleId, setRoleId] = useState(user.roleId); // Add Profile Type from API
+  const [roleId, setRoleId] = useState(user.roleId);
   const [onError, setOnError] = useState('');
   const [isEditing, setIsEditing] = useState(false);
-  const [image, setImage] = useState(user.image);
+  const [image, setImage] = useState('');
+
+  useEffect(() => {
+    if (user.image === null || !user.image) {
+      setImage('users/default-avatar');
+    } else {
+      setImage(user.image);
+    }
+  }, []);
+
+  const userRoleId = user.roleId;
 
   const { data } = useSuspenseQuery<Role[]>(getRoles);
   const roles = data.roles;
-
-  const userRoleId = user.roleId;
 
   const { data: dataUserRole } = useSuspenseQuery<Role>(getRoleById, {
     variables: { roleId: userRoleId },
@@ -123,7 +132,7 @@ export default function UserInfoEdit({ user }: { user: User }) {
       city,
       country,
       email,
-      passwordHash,
+      password,
       phone,
       roleId,
     },
@@ -136,6 +145,7 @@ export default function UserInfoEdit({ user }: { user: User }) {
 
     onCompleted: async () => {
       setOnError('');
+      setPassword('');
       toast.success(' Profile updated successfully');
       // await refetch();
     },
@@ -195,10 +205,11 @@ export default function UserInfoEdit({ user }: { user: User }) {
               </label>
               <input
                 id="password"
+                type="password"
                 placeholder="New password"
                 className="input input-bordered join-item w-full mb-2"
                 onChange={(e) => {
-                  setPasswordHash(e.currentTarget.value);
+                  setPassword(e.currentTarget.value);
                 }}
               />
 

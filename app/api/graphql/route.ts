@@ -2,10 +2,12 @@ import { gql } from '@apollo/client';
 import { ApolloServer } from '@apollo/server';
 import { startServerAndCreateNextHandler } from '@as-integrations/next';
 import { makeExecutableSchema } from '@graphql-tools/schema';
+import bcrypt from 'bcrypt';
 import { GraphQLError } from 'graphql';
 import { cookies } from 'next/headers';
 // import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
+import { set } from 'zod';
 import {
   createCategory,
   deleteCategoryById,
@@ -35,8 +37,10 @@ import {
   getUsers,
   isUserAdminBySessionToken,
   updateUserById,
+  updateUserByIdWithoutPassword,
   updateUserImageByUserId,
 } from '../../../database/users';
+import { createSessionToken } from '../../../util/auth';
 import {
   CreateCategoryArgs,
   CreateRoleArgs,
@@ -44,6 +48,7 @@ import {
   FakeAdminUserContext,
   GraphQlResponseBody,
   Listing,
+  LoginResponse,
 } from '../../../util/types';
 
 const typeDefs = gql`
@@ -57,6 +62,10 @@ const typeDefs = gql`
   type Status {
     id: ID!
     name: String
+  }
+
+  type LoginResponse {
+    user: User!
   }
   type User {
     id: ID!
@@ -126,8 +135,7 @@ const typeDefs = gql`
 
   type Mutation {
     # Users
-    ## Create
-    createUser(username: String!, email: String!, passwordHash: String!): User!
+
     ## Delete
     deleteUserById(id: ID!): User!
     ## Update
@@ -142,10 +150,9 @@ const typeDefs = gql`
       city: String
       country: String
       email: String
-      passwordHash: String
+      password: String
       phone: String
       roleId: Int
-      image: String
     ): User!
 
     updateUserImageByUserId(id: ID!, image: String): User!
@@ -164,14 +171,9 @@ const typeDefs = gql`
 
     # Authentication
     ## Login
-    login(username: String!, passwordHash: String!): User
+    login(username: String!, password: String!): LoginResponse!
     ## Register
-    register(
-      username: String!
-      passwordHash: String!
-      email: String!
-      image: String!
-    ): User
+    register(username: String!, password: String!, email: String!): User
 
     # Listing
     ## Create
@@ -256,7 +258,9 @@ const resolvers = {
       parent: null,
       args: { id: string },
     ) => {
-      return await getActiveListingsByCategoryIdSortedByCreatedAt(parseInt(args.id));
+      return await getActiveListingsByCategoryIdSortedByCreatedAt(
+        parseInt(args.id),
+      );
     },
 
     loggedInUserByUsername: async (
@@ -269,46 +273,6 @@ const resolvers = {
 
   Mutation: {
     // User
-
-    // // Create User
-    createUser: async (parent: null, args: CreateUserArgs) => {
-      // All of these checks are "end point based authentications"
-      if (typeof args.username !== 'string' || !args.username) {
-        throw new GraphQLError('Required field username is missing');
-      } else if (typeof args.email !== 'string' || !args.email) {
-        throw new GraphQLError('Required field email is missing');
-      } else if (typeof args.passwordHash !== 'string' || !args.passwordHash) {
-        throw new GraphQLError('Required field passwordHash is missing');
-      }
-
-      // const hashedPassword = await bcrypt.hash(args.passwordHash, 10);
-
-      // const newUser = await createUser(
-      //   args.username,
-      //   args.email,
-      //   args.passwordHash,
-      // );
-
-      // if (!newUser) {
-      //   throw new GraphQLError('No user was created');
-      // }
-
-      // const payload = {
-      //   userId: newUser.id,
-      //   username: newUser.username,
-      //   email: newUser.email,
-      // };
-
-      // const options = {
-      //   expiresIn: '24h',
-      // };
-      // const token = jwt.sign(payload, process.env.JWT_SECRET!.options);
-      // console.log('token: ', token);
-
-      // const session = await createSessi
-
-      return await createUser(args.username, args.email, args.passwordHash);
-    },
 
     // // Delete User By ID
     deleteUserById: async (
@@ -336,12 +300,32 @@ const resolvers = {
         city: string;
         country: string;
         email: string;
-        passwordHash: string;
+        password: string;
         phone: string;
         roleId: number;
-        image: string;
       },
     ) => {
+      if (args.password === '') {
+        return await updateUserByIdWithoutPassword(
+          parseInt(args.id),
+          args.username,
+          args.firstName,
+          args.lastName,
+          args.birthDate,
+          args.address,
+          args.postalCode,
+          args.city,
+          args.country,
+          args.email,
+          args.phone,
+          args.roleId,
+        );
+      }
+      const passwordHash: string = await bcrypt.hash(args.password, 10);
+      console.log(
+        'passwordHash inside updateUserById mutation: ',
+        passwordHash,
+      );
       return await updateUserById(
         parseInt(args.id),
         args.username,
@@ -353,10 +337,9 @@ const resolvers = {
         args.city,
         args.country,
         args.email,
-        args.passwordHash,
+        passwordHash,
         args.phone,
         args.roleId,
-        args.image,
       );
     },
 
@@ -523,32 +506,42 @@ const resolvers = {
 
     login: async (
       parent: null,
-      args: { username: string; passwordHash: string },
+      args: { username: string; password: string },
     ) => {
       // Check if both credentials are filled in
       if (typeof args.username !== 'string' || !args.username) {
         throw new GraphQLError('Required field username missing');
-      } else if (typeof args.passwordHash !== 'string' || !args.passwordHash) {
-        throw new GraphQLError('Required field passwordHash missing');
+      } else if (typeof args.password !== 'string' || !args.password) {
+        throw new GraphQLError('Required field password missing');
       }
 
       const user = await getUserByUsername(args.username);
-      if (
-        args.username !== user?.username ||
-        args.passwordHash !== user.passwordHash
-      ) {
+
+      if (!user) {
+        throw new GraphQLError('No user found');
+      }
+      console.log('args.password: ', args.password);
+      console.log('user.passwordHash: ', user.passwordHash);
+      const auth: boolean = await bcrypt.compare(
+        args.password,
+        user.passwordHash,
+      );
+
+      if (!auth) {
         throw new GraphQLError('Invalid username or password');
       }
 
+      const sessionToken = await createSessionToken(user);
+
       // Set Session cookie
-      cookies().set('fakeSession', args.username, {
+      cookies().set('sessionToken', sessionToken, {
         httpOnly: true,
         sameSite: 'lax',
         path: '/',
         maxAge: 60 * 60 * 24 * 30, // 30 days
       });
 
-      return await getUserByUsername(args.username);
+      return { user } as LoginResponse;
     },
 
     // // Register
@@ -557,9 +550,8 @@ const resolvers = {
       parent: null,
       args: {
         username: string;
-        passwordHash: string;
+        password: string;
         email: string;
-        image: string;
       },
     ) => {
       // Indicate "location"
@@ -567,46 +559,29 @@ const resolvers = {
 
       // Check if credentials are filled in
       if (typeof args.username !== 'string' || !args.username) {
-        throw new GraphQLError('Required field username missing');
-      } else if (typeof args.passwordHash !== 'string' || !args.passwordHash) {
-        throw new GraphQLError('Required field passwordHash missing');
+        throw new GraphQLError('Required field us11ername missing');
+      } else if (typeof args.password !== 'string' || !args.password) {
+        throw new GraphQLError('Required field password missing');
       } else if (typeof args.email !== 'string' || !args.email) {
         throw new GraphQLError('Required field email missing');
       }
 
       // Display argument values
       console.log('username in register mutation: ', args.username);
-      console.log('passwordHash in register mutation: ', args.passwordHash);
+      console.log('password in register mutation: ', args.password);
       console.log('email in register mutation: ', args.email);
-      console.log('image in register mutation: ', args.image);
 
       const user = await getUserByUsername(args.username);
 
       // Check if user with given username already exists
-      if (args.username !== user?.username) {
-        // Create user
-        await createUser(
-          args.username,
-          args.email,
-          args.passwordHash,
-          args.image,
-        );
-        // Set session cookie
-        console.log(
-          'Setting cookie fakeSession with username: ',
-          args.username,
-        );
-        cookies().set('fakeSession', args.username, {
-          httpOnly: true,
-          sameSite: 'lax',
-          path: '/',
-          maxAge: 60 * 60 * 24 * 30, // 30 days
-        });
-      } else {
+      if (args.username === user?.username) {
         throw new GraphQLError('User already exists');
       }
 
-      return await getUserByUsername(args.username);
+      const passwordHash: string = await bcrypt.hash(args.password, 10);
+      console.log('passwordHash inside register mutation: ', passwordHash);
+      // Create user
+      return await createUser(args.username, args.email, passwordHash);
     },
   },
 };
@@ -623,9 +598,9 @@ const apolloServer = new ApolloServer({
 const handler = startServerAndCreateNextHandler<NextRequest>(apolloServer, {
   context: async (req) => {
     // FIXME: Implement secure authentication
-    const fakeSessionToken = req.cookies.get('fakeSession');
+    const sessionToken = req.cookies.get('sessionToken');
 
-    const isAdmin = await isUserAdminBySessionToken(fakeSessionToken?.value);
+    const isAdmin = await isUserAdminBySessionToken(sessionToken?.value);
 
     return { req, isAdmin };
   },

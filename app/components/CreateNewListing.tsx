@@ -1,10 +1,13 @@
 'use client';
 import 'react-toastify/dist/ReactToastify.css';
 import { gql, useMutation, useQuery } from '@apollo/client';
+import { useSuspenseQuery } from '@apollo/experimental-nextjs-app-support/ssr';
 import { CldImage, CldUploadButton } from 'next-cloudinary';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
+import { User, UserSuspenseQuery } from '../../util/types';
 import CategoriesDialog from './CategoriesDialog';
 
 const createListing = gql`
@@ -40,6 +43,8 @@ const getUser = gql`
     user(id: $loggedInUserId) {
       id
       username
+      firstName
+      lastName
       email
       address
       postalCode
@@ -56,7 +61,7 @@ export default function CreateNewListing({
   loggedInUserId: number;
 }) {
   const [title, setTitle] = useState('');
-  const [price, setPrice] = useState(0);
+  const [price, setPrice] = useState(1);
   const [description, setDescription] = useState('');
   const [image, setImage] = useState('listings/default-listing-placeholder');
   const [categoryId, setCategoryId] = useState(0);
@@ -88,19 +93,34 @@ export default function CreateNewListing({
       setImage('listings/default-listing-placeholder');
       toast.success('Listing created successfully');
       router.refresh();
+      router.push('/listings');
     },
   });
 
-  const { data, loading, error } = useQuery(getUser, {
+  const { data, error } = useSuspenseQuery<UserSuspenseQuery>(getUser, {
     variables: { loggedInUserId },
   });
 
-  if (loading) {
-    <div>User information loading...</div>;
-  }
   if (error) {
     <div>{error.message}</div>;
   }
+
+  const user = data.user;
+
+  const isUserProfileComplete = (user: User) => {
+    const requiredFields = [
+      'firstName',
+      'phone',
+      'address',
+      'postalCode',
+      'city',
+      'country',
+      'phone',
+    ];
+    return requiredFields.every(
+      (field) => user[field] !== null && user[field] !== '',
+    );
+  };
 
   return (
     <div className="sm:col-span-10 xl:col-span-8 2xl:col-span-6">
@@ -199,76 +219,88 @@ export default function CreateNewListing({
 
         <br />
 
-        <h2 className="text-3xl my-2">Contact and place of sale</h2>
+        <h2 className="text-3xl my-2">Contact</h2>
+        <hr />
+        {isUserProfileComplete(user) ? (
+          <>
+            <div className="flex gap-2 flex-col">
+              <div className="grid grid-cols-2">
+                <div className="col-span-1 py-2 px-1">
+                  <span className="font-medium text-base">Name</span>
+                  <p>{user.firstName}</p>
+                </div>
 
-        <div className="flex gap-2 flex-col">
-          <div className="grid grid-cols-2">
-            <div className="col-span-1 py-2 px-1">
-              <span className="font-medium text-base">Name</span>
-              <p>user.firstname</p>
+                <div className="col-span-1 py-2 px-1">
+                  <span className="font-medium text-base">Email</span>
+                  <p>{user.email}</p>
+                </div>
+
+                <div className="col-span-1 py-2 px-1">
+                  <span className="font-medium text-base">Phone</span>
+                  <p>{user.phone}</p>
+                </div>
+              </div>
+              <div className="py-2 px-1 text-sm text-slate-500">
+                ℹ You can change your profile information in your{' '}
+                <Link
+                  className="underline text-primary hover:text-primary visited:text-secondary"
+                  href="/settings"
+                >
+                  profile settings
+                </Link>
+              </div>
             </div>
+            <h2 className="text-3xl my-2">Place of sale</h2>
+            <hr />
+            <div className="grid grid-cols-2">
+              <div className="col-span-1 py-2 px-1">
+                <span className="font-medium text-base">Country</span>
+                <p>{user.country}</p>
+              </div>
 
-            <div className="col-span-1 py-2 px-1">
-              <span className="font-medium text-base">Email</span>
-              <p>your@email.xyz</p>
+              <div className="col-span-1 py-2 px-1">
+                <span className="font-medium text-base">City</span>
+                <p>{user.city}</p>
+              </div>
+              <div className="col-span-1 py-2 px-1">
+                <span className="font-medium text-base">Address</span>
+                <p>{user.address}</p>
+              </div>
+              <div className="col-span-1 py-2 px-1">
+                <span className="font-medium text-base">Postal code</span>
+                <p>{user.postalCode}</p>
+              </div>
+              <div className="py-2 px-1 text-sm text-slate-500">
+                ℹ You can change your address information in your{' '}
+                <Link
+                  className="underline text-primary hover:text-primary visited:text-secondary"
+                  href="/settings"
+                >
+                  profile settings
+                </Link>
+              </div>
             </div>
+            <button
+              onClick={async () => {
+                await handleCreateListing();
+              }}
+              className="btn btn-primary my-4 text-white"
+            >
+              Publish
+            </button>
+          </>
+        ) : (
+          <div>
+            Please{' '}
+            <Link
+              className="underline text-primary hover:text-primary visited:text-secondary"
+              href="/settings"
+            >
+              complete your profile information
+            </Link>{' '}
+            before you create a new listing
           </div>
-          <div className="py-2 px-1">
-            <span className="text-sm text-slate-500">
-              ℹ You can change your name and email address in your profile
-              settings
-            </span>
-          </div>
-
-          <label htmlFor="country" className="label">
-            <span className="label-text font-medium text-base">Country</span>
-          </label>
-          <select
-            id="country"
-            className="select select-bordered w-full max-w-xs"
-          >
-            <option>Austria</option>
-            <option>Turkey</option>
-          </select>
-
-          <label htmlFor="street" className="label">
-            <span className="label-text font-medium text-base">Street</span>
-          </label>
-          <input
-            id="street"
-            placeholder="Street name"
-            className="input input-bordered w-full mb-2"
-          />
-
-          <div className="flex gap-2 ">
-            <label htmlFor="postal" className="label">
-              <span className="label-text font-medium text-base">
-                Postal code
-              </span>
-            </label>
-            <input
-              id="postal"
-              placeholder="12345"
-              className="input input-bordered w-full mb-2"
-            />
-            <label htmlFor="location" className="label">
-              <span className="label-text font-medium text-base">Location</span>
-            </label>
-            <input
-              id="location"
-              placeholder="location"
-              className="input input-bordered w-full mb-2"
-            />
-          </div>
-        </div>
-        <button
-          onClick={async () => {
-            await handleCreateListing();
-          }}
-          className="btn btn-primary my-4 text-white"
-        >
-          Publish
-        </button>
+        )}
       </div>
     </div>
   );

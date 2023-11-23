@@ -3,7 +3,7 @@ import { User } from '../util/types';
 import { sql } from './connect';
 
 export type UserWithPasswordHash = User & {
-  passwordHash: string;
+  password: string;
 };
 
 export const getUsers = cache(async () => {
@@ -26,17 +26,12 @@ export const getUserById = cache(async (id: number) => {
 });
 
 export const createUser = cache(
-  async (
-    username: string,
-    email: string,
-    password_hash: string,
-    image: string,
-  ) => {
+  async (username: string, email: string, password: string) => {
     const [user] = await sql<User[]>`
       INSERT INTO users
-        (username, email, password_hash, image)
+        (username, email, password_hash)
       VALUES
-        (${username}, ${email}, ${password_hash}, ${image})
+        (${username}, ${email}, ${password})
       RETURNING *
     `;
 
@@ -56,7 +51,7 @@ export const updateUserById = cache(
     city: string,
     country: string,
     email: string,
-    passwordHash: string,
+    password: string,
     phone: string,
     roleId: number,
     image: string,
@@ -73,10 +68,47 @@ export const updateUserById = cache(
         city = ${city},
         country = ${country},
         email = ${email},
-        password_hash = ${passwordHash},
+        password_hash = ${password},
         phone = ${phone},
         role_id = ${roleId},
         image = ${image}
+      WHERE
+        id = ${id}
+        RETURNING *
+    `;
+
+    return user;
+  },
+);
+export const updateUserByIdWithoutPassword = cache(
+  async (
+    id: number,
+    username: string,
+    firstName: string,
+    lastName: string,
+    birthDate: Date,
+    address: string,
+    postalCode: string,
+    city: string,
+    country: string,
+    email: string,
+    phone: string,
+    roleId: number,
+  ) => {
+    const [user] = await sql<User[]>`
+      UPDATE users
+      SET
+        username = ${username},
+        first_name = ${firstName},
+        last_name = ${lastName},
+        birth_date = ${birthDate},
+        address = ${address},
+        postal_code = ${postalCode},
+        city = ${city},
+        country = ${country},
+        email = ${email},
+        phone = ${phone},
+        role_id = ${roleId}
       WHERE
         id = ${id}
         RETURNING *

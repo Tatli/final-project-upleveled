@@ -20,7 +20,7 @@ SELECT
 FROM
   listings
 INNER JOIN categories ON categories.id = listings.category_id
-INNER JOIN users ON users.id = listings.user_id
+RIGHT JOIN users ON users.id = listings.user_id
 INNER JOIN status ON status.id = listings.status_id
 WHERE status.id = 1
 ORDER BY created_at DESC;
