@@ -5,22 +5,25 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 const registerMutation = gql`
-  mutation Register(
-    $username: String!
-    $password: String!
-    $email: String!
-    $image: String!
-  ) {
-    register(
-      username: $username
-      passwordHash: $password
-      email: $email
-      image: $image
-    ) {
+  mutation Register($username: String!, $password: String!, $email: String!) {
+    register(username: $username, password: $password, email: $email) {
       id
       username
       email
+      passwordHash
       image
+    }
+  }
+`;
+
+const loginMutation = gql`
+  mutation Login($username: String!, $password: String!) {
+    login(username: $username, password: $password) {
+      user {
+        id
+        email
+        username
+      }
     }
   }
 `;
@@ -29,38 +32,45 @@ export default function RegisterForm() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
-  const [image, setImage] = useState('users/default-avatar');
   const [onError, setOnError] = useState('');
   const [newsletter, setNewsletter] = useState(false);
   const [acceptAgreements, setAcceptAgreements] = useState(false);
   const [onCompleted, setOnCompleted] = useState('');
   const router = useRouter();
 
-  const [registerHandler] = useMutation(registerMutation, {
+  const [loginHandler] = useMutation(loginMutation, {
     variables: {
       username,
       password,
-      email,
-      image,
     },
 
     onError: (error) => {
       console.log('username in onError: ', username);
       console.log('password in onError: ', password);
-      console.log('email in onError: ', email);
-      console.log('image in onError: ', image);
-      console.log('error: ', error.message);
       setOnError(error.message);
     },
 
     onCompleted: () => {
       // This might not be needed
-      console.log('onCompleted in registerHandler in RegisterForm');
-      console.log('username in onCompleted: ', username);
-      console.log('password in onCompleted: ', password);
-      console.log('email in onCompleted: ', email);
-      console.log('image in onCompleted: ', email);
-      setOnCompleted(onCompleted.message);
+      console.log('onCompleted in loginHandler in LoginForm');
+      router.refresh();
+    },
+  });
+
+  const [registerHandler] = useMutation(registerMutation, {
+    variables: {
+      username,
+      password,
+      email,
+    },
+
+    onError: (error) => {
+      console.log('error: ', error.message);
+      setOnError(error.message);
+    },
+
+    onCompleted: async () => {
+      await loginHandler();
       router.refresh();
     },
   });
