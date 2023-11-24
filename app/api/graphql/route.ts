@@ -556,12 +556,21 @@ const resolvers = {
     ) => {
       // Indicate "location"
       console.log('Inside register mutation');
-
+      console.log(
+        'typeof args.email in register mutation: ',
+        typeof args.email,
+      );
+      const mailRegex = new RegExp(
+        '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}$',
+        'i',
+      );
       // Check if credentials are filled in
       if (typeof args.username !== 'string' || !args.username) {
-        throw new GraphQLError('Required field us11ername missing');
+        throw new GraphQLError('Required field username missing');
       } else if (typeof args.password !== 'string' || !args.password) {
         throw new GraphQLError('Required field password missing');
+      } else if (!args.email.match(mailRegex)) {
+        throw new GraphQLError('Email has to be in format test@gmail.com');
       } else if (typeof args.email !== 'string' || !args.email) {
         throw new GraphQLError('Required field email missing');
       }

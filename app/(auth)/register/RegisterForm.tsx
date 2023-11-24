@@ -82,7 +82,7 @@ export default function RegisterForm() {
         <h1 className="text-5xl pb-4">Register</h1>
         <hr />
         <br />
-        <div className="form-control w-full">
+        <form className="form-control w-full">
           <label>
             <span className="label-text font-medium text-base">Username</span>
             <input
@@ -112,6 +112,7 @@ export default function RegisterForm() {
               className="input input-bordered w-full"
               type="email"
               value={email}
+              required
               onChange={(event) => {
                 setEmail(event.currentTarget.value);
               }}
@@ -166,7 +167,7 @@ export default function RegisterForm() {
           >
             Register
           </button>
-        </div>
+        </form>
         Already have a user?{' '}
         <Link className="text-primary hover:text-primary-focus" href="/login">
           Login here
