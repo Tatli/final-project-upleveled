@@ -15,7 +15,7 @@ https://final-project-upleveled-tatli.fly.dev/
 - [Tailwind CSS](https://tailwindcss.com/)
 - [DaisyUI](https://daisyui.com/)
 - [Cloudinary](https://cloudinary.com/)
-- [Dpcker](https://www.docker.com/)
+- [Docker](https://www.docker.com/)
 - [VS Code](https://code.visualstudio.com/)
 
 ### Getting Started
