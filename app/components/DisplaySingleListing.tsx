@@ -112,9 +112,12 @@ export default function DisplaySingleListing({
         <button className="btn btn-primary text-white font-bold py-2 px-4 w-full mb-4">
           Contact
         </button>
-        <button className="btn btn-outline btn-primary font-bold py-2 px-4 w-full mb-4">
+        <Link
+          href={`users/${listing.userId}`}
+          className="btn btn-outline btn-primary font-bold py-2 px-4 w-full mb-4"
+        >
           More from {listing.username}
-        </button>
+        </Link>
       </div>
       <div className="col-span-1" />
     </div>
