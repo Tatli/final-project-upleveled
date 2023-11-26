@@ -5,9 +5,9 @@ import Link from 'next/link';
 import React from 'react';
 import { Listing } from '../../util/types';
 
-const getListingsSortedByCreatedAt = gql`
-  query GetListingsSortedByCreatedAt {
-    getListingsSortedByCreatedAt {
+const getActiveUserListingsByUserIdSortedByCreatedAtJoined = gql`
+  query GetActiveUserListingsByUserIdSortedByCreatedAtJoined($userId: ID!) {
+    getActiveUserListingsByUserIdSortedByCreatedAtJoined(id: $userId) {
       id
       title
       price
@@ -27,9 +27,17 @@ const getListingsSortedByCreatedAt = gql`
   }
 `;
 
-export default function DisplayNewestListings() {
+export default function DisplaySpecificUserListings({
+  userId,
+}: {
+  userId: number;
+}) {
+  console.log('userId inside DisplaySpecificUserListings: ', userId);
   // Fetch all sorted listings
-  const { data, loading, error } = useQuery(getListingsSortedByCreatedAt);
+  const { data, loading, error } = useQuery(
+    getActiveUserListingsByUserIdSortedByCreatedAtJoined,
+    { variables: { userId } },
+  );
 
   if (loading) {
     return <div>loading listings...</div>;
@@ -39,16 +47,24 @@ export default function DisplayNewestListings() {
   }
 
   if (!data) {
-    return <div>There are no new listings to be displayed</div>;
+    return <div>This user does not have any listings to be displayed</div>;
   } else {
-    const newestListings = data.getListingsSortedByCreatedAt;
-    console.log('newestListings from DisplayNewestListings: ', newestListings);
+    const newestListings =
+      data.getActiveUserListingsByUserIdSortedByCreatedAtJoined;
+    console.log(
+      'newestListings from DisplaySpecificUserListings: ',
+      newestListings,
+    );
 
+    const userListing = newestListings[0];
     return (
       <div>
         <section className="mx-2 sm:mx-8 lg:mx-24 2xl:mx-40">
-          <h1 className="text-center sm:text-3xl md:text-4xl lg:text-5xl  mb-6 mt-10">
-            Newest listings:
+          <h1 className="text-center sm:text-2xl md:text-3xl lg:text-5xl mb-6 mt-10">
+            Newest listings by {userListing.username} -{' '}
+            <span className="border border-solid rounded px-2">
+              {newestListings.length}
+            </span>
           </h1>
           <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
             {newestListings.map((listing: Listing) => {
@@ -63,7 +79,7 @@ export default function DisplayNewestListings() {
                     name={listing.title}
                   >
                     <Link href={`/users/${listing.userId}`}>
-                      <div className="avatar hover:bg-primary hover:text-white pr-4">
+                      <div className="avatar">
                         <div className="w-6 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2 mr-2 ml-2">
                           <CldImage
                             width="300"

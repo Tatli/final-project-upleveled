@@ -19,6 +19,7 @@ import {
   createListing,
   deleteListingById,
   getActiveListingsByCategoryIdSortedByCreatedAt,
+  getActiveUserListingsByUserIdSortedByCreatedAtJoined,
   getListings,
   getListingsSortedByCreatedAt,
   getUserListingByListingIdJoined,
@@ -128,6 +129,7 @@ const typeDefs = gql`
 
     listings: [Listing!]!
     userListingsByUserIdJoined(id: ID!): [Listing!]!
+    getActiveUserListingsByUserIdSortedByCreatedAtJoined(id: ID!): [Listing!]!
     userListingByListingIdJoined(id: ID!): [Listing!]!
     getActiveListingsByCategoryIdSortedByCreatedAt(id: ID!): [Listing!]!
     getListingsSortedByCreatedAt: [Listing!]!
@@ -245,6 +247,14 @@ const resolvers = {
 
     userListingsByUserIdJoined: async (parent: null, args: { id: string }) => {
       return await getUserListingsByUserIdJoined(parseInt(args.id));
+    },
+    getActiveUserListingsByUserIdSortedByCreatedAtJoined: async (
+      parent: null,
+      args: { id: string },
+    ) => {
+      return await getActiveUserListingsByUserIdSortedByCreatedAtJoined(
+        parseInt(args.id),
+      );
     },
 
     userListingByListingIdJoined: async (

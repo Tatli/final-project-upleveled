@@ -53,7 +53,6 @@ export default function RegisterForm() {
     onCompleted: () => {
       // This might not be needed
       console.log('onCompleted in loginHandler in LoginForm');
-      router.refresh();
     },
   });
 
@@ -82,7 +81,13 @@ export default function RegisterForm() {
         <h1 className="text-5xl pb-4">Register</h1>
         <hr />
         <br />
-        <form className="form-control w-full">
+        <form
+          onSubmit={async (e) => {
+            e.preventDefault();
+            await registerHandler();
+          }}
+          className="form-control w-full"
+        >
           <label>
             <span className="label-text font-medium text-base">Username</span>
             <input
@@ -112,7 +117,6 @@ export default function RegisterForm() {
               className="input input-bordered w-full"
               type="email"
               value={email}
-              required
               onChange={(event) => {
                 setEmail(event.currentTarget.value);
               }}
@@ -137,6 +141,7 @@ export default function RegisterForm() {
                 <input
                   className="checkbox checkbox-primary mt-2"
                   type="checkbox"
+                  required
                   checked={acceptAgreements}
                   onChange={(e) => setAcceptAgreements(e.currentTarget.checked)}
                 />
@@ -159,14 +164,7 @@ export default function RegisterForm() {
               </label>
             </div>
           </div>
-          <button
-            className="btn btn-primary my-4 text-white"
-            onClick={async () => {
-              await registerHandler();
-            }}
-          >
-            Register
-          </button>
+          <button className="btn btn-primary my-4 text-white">Register</button>
         </form>
         Already have a user?{' '}
         <Link className="text-primary hover:text-primary-focus" href="/login">

@@ -183,7 +183,14 @@ export default function UserInfoEdit({ user }: { user: User }) {
         <hr />
         <br />
 
-        <div className="form-control w-full">
+        <form
+          className="form-control w-full"
+          onSubmit={async (e) => {
+            e.preventDefault();
+            await setIsEditing(false);
+            await handleUpdateUser();
+          }}
+        >
           {isEditing ? (
             <>
               <h2 className="text-2xl ">User Information</h2>
@@ -337,7 +344,7 @@ export default function UserInfoEdit({ user }: { user: User }) {
               <input
                 value={country}
                 id="country"
-                placeholder="Last name"
+                placeholder="Country"
                 className="input input-bordered w-full mb-2"
                 onChange={(e) => {
                   setCountry(e.currentTarget.value);
@@ -503,19 +510,21 @@ export default function UserInfoEdit({ user }: { user: User }) {
           )}
 
           {isEditing ? (
-            <button
-              className="btn btn-outline btn-success mt-2"
-              onClick={async () => {
-                await setIsEditing(false);
-                await handleUpdateUser();
-              }}
-            >
-              Save
-            </button>
+            <>
+              <button className="btn btn-outline btn-success mt-2">Save</button>
+              <button
+                className="btn btn-outline mt-2"
+                onClick={(e) => {
+                  setIsEditing(false);
+                }}
+              >
+                Cancel
+              </button>
+            </>
           ) : (
             <button
               className="btn btn-outline mt-2"
-              onClick={() => {
+              onClick={(e) => {
                 setIsEditing(true);
               }}
             >
@@ -525,7 +534,7 @@ export default function UserInfoEdit({ user }: { user: User }) {
           <p className="text-error">{onError}</p>
 
           {/* <button className="btn btn-primary my-4">Save</button> */}
-        </div>
+        </form>
       </div>
 
       <div className="sm:col-span-12 md:col-span-4 mx-8">

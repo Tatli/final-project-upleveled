@@ -49,7 +49,7 @@ export default function LoginForm() {
         <h1 className="text-5xl pb-4">Login</h1>
         <hr />
         <br />
-        <div className="form-control w-full">
+        <form className="form-control w-full">
           <label>
             <span className="label-text font-medium text-base">Username</span>
             <input
@@ -96,13 +96,14 @@ export default function LoginForm() {
           </div>
           <button
             className="btn btn-primary my-4 text-white"
-            onClick={async () => {
+            onClick={async (e) => {
+              e.preventDefault();
               await loginHandler();
             }}
           >
             Login
           </button>
-        </div>
+        </form>
         <div className="error">{onError}</div>
         No user yet?{' '}
         <Link

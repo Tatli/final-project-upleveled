@@ -1,5 +1,7 @@
+'use server';
 import { gql } from '@apollo/client';
 import { getCldImageUrl } from 'next-cloudinary';
+import Head from 'next/head';
 // import Image from 'next/image';
 import { getClient } from '../../../util/apolloClient';
 import CategoryHero from '../../components/CategoryHero';
@@ -54,6 +56,17 @@ export default async function CategoryPage(props: Props) {
 
   return (
     <>
+      {console.log(
+        'category.name inside [categoryId] before Head: ',
+        category.name,
+      )}
+      <Head>
+        <title>{`${category.name} | Firsthand`}</title>
+        <meta
+          name="description"
+          content={`Explore our ${category.name} listings`}
+        />
+      </Head>
       <section style={sectionStyle}>
         <div
           className={`flex flex-col justify-center align-baseline py-15 text-white overflow-hidden h-96 min-h-96 max-h-96`}

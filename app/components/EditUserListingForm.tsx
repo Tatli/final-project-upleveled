@@ -55,6 +55,7 @@ const updateListingById = gql`
     }
   }
 `;
+
 const updateListingImageByListingId = gql`
   mutation UpdateListingImageByListingId($id: ID!, $image: String!) {
     updateListingImageByListingId(id: $id, image: $image) {
@@ -274,69 +275,8 @@ export default function EditUserListingForm({ listing }: { listing: Listing }) {
         </button>
         <span className="text-sm text-slate-500">
           ℹ Images help potential customers better imagine your product
-        </span>{' '}
-        <br />
-        <h2 className="text-3xl my-2">Contact and place of sale</h2>
-        <div className="flex gap-2 flex-col">
-          <div className="grid grid-cols-2">
-            <div className="col-span-1 py-2 px-1">
-              <span className="font-medium text-base">Name</span>
-              <p>user.firstname</p>
-            </div>
+        </span>
 
-            <div className="col-span-1 py-2 px-1">
-              <span className="font-medium text-base">Email</span>
-              <p>your@email.xyz</p>
-            </div>
-          </div>
-          <div className="py-2 px-1">
-            <span className="text-sm text-slate-500">
-              ℹ You can change your name and email address in your profile
-              settings
-            </span>
-          </div>
-
-          <label htmlFor="country" className="label">
-            <span className="label-text font-medium text-base">Country</span>
-          </label>
-          <select
-            id="country"
-            className="select select-bordered w-full max-w-xs"
-          >
-            <option>Austria</option>
-            <option>Turkey</option>
-          </select>
-
-          <label htmlFor="street" className="label">
-            <span className="label-text font-medium text-base">Street</span>
-          </label>
-          <input
-            id="street"
-            placeholder="Street name"
-            className="input input-bordered w-full mb-2"
-          />
-
-          <div className="flex gap-2 ">
-            <label htmlFor="postal" className="label">
-              <span className="label-text font-medium text-base">
-                Postal code
-              </span>
-            </label>
-            <input
-              id="postal"
-              placeholder="12345"
-              className="input input-bordered w-full mb-2"
-            />
-            <label htmlFor="location" className="label">
-              <span className="label-text font-medium text-base">Location</span>
-            </label>
-            <input
-              id="location"
-              placeholder="location"
-              className="input input-bordered w-full mb-2"
-            />
-          </div>
-        </div>
         <button
           onClick={async () => {
             setUpdatedAt(new Date().toISOString());

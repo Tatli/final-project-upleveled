@@ -5,7 +5,9 @@ export default function Hero() {
     <section>
       <div className="flex flex-col justify-center align-baseline py-15 bg-[url('https://images.pexels.com/photos/6069544/pexels-photo-6069544.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1')] text-white overflow-hidden h-96 min-h-96 max-h-96 bg-center	bg-no-repeat bg-cover">
         <div className="flex justify-center">
-          <h1 className="text-6xl mb-6">Rediscover the Joy of First Finds!</h1>
+          <h1 className="mb-6 sm:text-3xl md:text-4xl lg:text-6xl ">
+            Rediscover the Joy of First Finds!
+          </h1>
         </div>
 
         <div className="flex justify-center">

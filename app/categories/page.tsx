@@ -6,11 +6,12 @@ import { redirect } from 'next/navigation';
 import { CategoryResponse } from '../../util/types';
 import Categories from '../components/Categories';
 
-// export type LoggedInUserResponse = {
-//   id: number;
-//   username: string;
-// };
-
+export function generateMetadata() {
+  return {
+    title: `Categories`,
+    description: `Categories page`,
+  };
+}
 export default async function CategoriesPage() {
   // const sessionToken = cookies().get('sessionToken');
 

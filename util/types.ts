@@ -138,6 +138,7 @@ export type CategoriesProps = {
   setCategoryId: React.Dispatch<React.SetStateAction<number>>;
 };
 
+export type UserIdProps = { userId: string };
 export type EditUserListingPropParams = { listingId: string };
 
 export type Status = {

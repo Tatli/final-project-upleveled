@@ -13,8 +13,9 @@ import Footer from './components/Footer';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Secondhand',
-  description: 'Find Secondhand Treasures.',
+  // %s is our String placeholder and will be replaced with the {title: titleName} inside of About/Products/etc
+  title: { default: 'Home | Firsthand', template: '%s | Firsthand' },
+  description: 'Firsthand: Rediscover the Joy of First Finds!',
 };
 
 export default async function RootLayout({
