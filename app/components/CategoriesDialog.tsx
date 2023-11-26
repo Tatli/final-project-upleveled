@@ -17,9 +17,7 @@ export default function CategoriesDialog({
   setCategoryId,
 }: CategoriesProps) {
   const { data } = useSuspenseQuery<CategoryResponse>(getCategories);
-  // console.log('data: ', data);
   const categories = data.categories;
-  console.log('categories: ', categories);
   return (
     <>
       <button
@@ -45,11 +43,7 @@ export default function CategoriesDialog({
                   className="radio radio-primary mr-2"
                   checked={Number(category.id) === Number(categoryId)}
                   onChange={(e) => {
-                    console.log(
-                      `Category inside dialog with id ${category.id} has been checked`,
-                    );
                     setCategoryId(parseInt(e.target.value));
-                    console.log(`Value inside categoryId: `, categoryId);
                   }}
                 />
                 <span>{category.name}</span>

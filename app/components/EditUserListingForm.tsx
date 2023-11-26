@@ -109,7 +109,6 @@ export default function EditUserListingForm({ listing }: { listing: Listing }) {
       },
 
       onCompleted: async () => {
-        console.log(image);
         setOnError('');
         toast.success('Listing image updated successfully');
         await refetch();
@@ -203,7 +202,6 @@ export default function EditUserListingForm({ listing }: { listing: Listing }) {
           className="textarea textarea-primary mb-2"
           onChange={(e) => {
             setDescription(e.currentTarget.value);
-            console.log('description:', description);
           }}
           placeholder="e.g. dimensions, size, reasons for sale, defects/defects if any."
         />
@@ -258,9 +256,7 @@ export default function EditUserListingForm({ listing }: { listing: Listing }) {
               'public_id' in result.info &&
               result.info.public_id
             ) {
-              console.log('inside: ', result.info.public_id.toString());
               setImage(result.info.public_id.toString());
-              console.log('image inside cld upload onSuccess: ', image);
             }
           }}
           uploadPreset="uwugz2aw"

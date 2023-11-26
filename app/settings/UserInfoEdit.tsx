@@ -83,8 +83,6 @@ const updateUserImageByUserId = gql`
 export default function UserInfoEdit({ user }: { user: User }) {
   const formattedBirthDate = user.birthDate?.toString().split('T')[0];
 
-  console.log('user.image inside UserInfoEdit', user.image);
-
   const [username, setUsername] = useState(user.username);
   const [firstName, setFirstName] = useState(user.firstName);
   const [lastName, setLastName] = useState(user.lastName);
@@ -163,7 +161,6 @@ export default function UserInfoEdit({ user }: { user: User }) {
     },
 
     onCompleted: async () => {
-      console.log(image);
       setOnError('');
       toast.success('Image updated successfully');
       // await refetch();
@@ -559,9 +556,7 @@ export default function UserInfoEdit({ user }: { user: User }) {
                 'public_id' in result.info &&
                 result.info.public_id
               ) {
-                console.log('inside: ', result.info.public_id.toString());
                 setImage(result.info.public_id.toString());
-                console.log('image inside cld upload onSuccess: ', image);
               }
             }}
             uploadPreset="uwugz2aw"

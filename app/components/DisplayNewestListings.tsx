@@ -42,7 +42,6 @@ export default function DisplayNewestListings() {
     return <div>There are no new listings to be displayed</div>;
   } else {
     const newestListings = data.getListingsSortedByCreatedAt;
-    console.log('newestListings from DisplayNewestListings: ', newestListings);
 
     return (
       <div>

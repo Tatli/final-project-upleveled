@@ -332,10 +332,7 @@ const resolvers = {
         );
       }
       const passwordHash: string = await bcrypt.hash(args.password, 10);
-      console.log(
-        'passwordHash inside updateUserById mutation: ',
-        passwordHash,
-      );
+
       return await updateUserById(
         parseInt(args.id),
         args.username,
@@ -530,8 +527,7 @@ const resolvers = {
       if (!user) {
         throw new GraphQLError('No user found');
       }
-      console.log('args.password: ', args.password);
-      console.log('user.passwordHash: ', user.passwordHash);
+
       const auth: boolean = await bcrypt.compare(
         args.password,
         user.passwordHash,
@@ -564,12 +560,6 @@ const resolvers = {
         email: string;
       },
     ) => {
-      // Indicate "location"
-      console.log('Inside register mutation');
-      console.log(
-        'typeof args.email in register mutation: ',
-        typeof args.email,
-      );
       const mailRegex = new RegExp(
         '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}$',
         'i',
@@ -585,11 +575,6 @@ const resolvers = {
         throw new GraphQLError('Required field email missing');
       }
 
-      // Display argument values
-      console.log('username in register mutation: ', args.username);
-      console.log('password in register mutation: ', args.password);
-      console.log('email in register mutation: ', args.email);
-
       const user = await getUserByUsername(args.username);
 
       // Check if user with given username already exists
@@ -598,7 +583,6 @@ const resolvers = {
       }
 
       const passwordHash: string = await bcrypt.hash(args.password, 10);
-      console.log('passwordHash inside register mutation: ', passwordHash);
       // Create user
       return await createUser(args.username, args.email, passwordHash);
     },

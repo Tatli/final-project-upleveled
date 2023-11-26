@@ -32,7 +32,6 @@ export default function DisplaySpecificUserListings({
 }: {
   userId: number;
 }) {
-  console.log('userId inside DisplaySpecificUserListings: ', userId);
   // Fetch all sorted listings
   const { data, loading, error } = useQuery(
     getActiveUserListingsByUserIdSortedByCreatedAtJoined,
@@ -51,10 +50,6 @@ export default function DisplaySpecificUserListings({
   } else {
     const newestListings =
       data.getActiveUserListingsByUserIdSortedByCreatedAtJoined;
-    console.log(
-      'newestListings from DisplaySpecificUserListings: ',
-      newestListings,
-    );
 
     const userListing = newestListings[0];
     return (

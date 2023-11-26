@@ -51,7 +51,6 @@ export default function DisplayListingsPerCategory({
     return <div>{error.message}</div>;
   }
 
-  console.log('data inside DisplayListingsPerCategory: ', data);
   const listingsOfCategorySortedByCreatedAt =
     data.getActiveListingsByCategoryIdSortedByCreatedAt;
   return (

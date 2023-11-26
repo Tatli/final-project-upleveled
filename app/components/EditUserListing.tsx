@@ -36,7 +36,6 @@ export default function EditUserListing({ listingId }: { listingId: number }) {
     },
   );
 
-  console.log('data inside EditUserListing: ', data);
   const listing: Listing = data.userListingByListingIdJoined[0];
 
   return (

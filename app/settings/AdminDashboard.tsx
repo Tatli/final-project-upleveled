@@ -27,8 +27,6 @@ const getUser = gql`
 `;
 
 export default function AdminDashboard({ userId }: { userId: string }) {
-  console.log('userId inside AdminDashboard: ', userId);
-
   const { data, loading, error } = useQuery(getUser, {
     variables: { userId },
   });

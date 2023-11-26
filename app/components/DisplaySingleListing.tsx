@@ -10,9 +10,7 @@ export default function DisplaySingleListing({
 }: {
   listingId: number;
 }) {
-  console.log('listingId inside DisplaySingleListing: ', listingId);
   const numericalListingId = Number(listingId);
-  console.log('listingId inside DisplaySingleListing: ', listingId);
 
   const getUserListingByListingIdJoined = gql`
     query UserListingByListingIdJoined($listingId: ID!) {
@@ -56,9 +54,7 @@ export default function DisplaySingleListing({
     return <div>{error.message}</div>;
   }
 
-  console.log('data inside DisplaySingleListing: ', data);
   const listing = data.userListingByListingIdJoined[0];
-  console.log('listing inside DisplaySingleListing: ', listing);
 
   const joinDate = new Date(listing.userRegistrationDate);
   const options = {
@@ -68,7 +64,6 @@ export default function DisplaySingleListing({
     // day: 'numeric',
   };
   const formattedJoinDate = joinDate.toLocaleDateString('en-US', options);
-  console.log('formattedJoinDate: ', formattedJoinDate);
   return (
     <div className="grid grid-cols-12">
       <div className="col-span-1" />

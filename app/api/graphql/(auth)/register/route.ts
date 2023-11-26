@@ -21,7 +21,6 @@ export async function POST(
 ): NextResponse<RegisterResponseBodyPost> {
   const body = await request.json();
 
-  console.log('(auth)/register -> POST -> body: ', body);
   // 1. Get the user data from request
   // 2. Validate the user data
   // 3. Check if user already exists in database

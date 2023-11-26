@@ -65,7 +65,6 @@ export default function UserListings({
   );
 
   const userListings: Listing[] = data.userListingsByUserIdJoined;
-  console.log('userListings, ', userListings);
 
   const [handleDeleteListingById] = useMutation(deleteListingById, {
     onError: (error) => {
@@ -85,20 +84,6 @@ export default function UserListings({
     });
   };
 
-  userListings.map((listing) => {
-    console.log('------ map start ------');
-    console.log('listing.id', listing.id);
-    console.log('listing.title', listing.title);
-    console.log('listing.price', listing.price);
-    console.log('listing.description', listing.description);
-    console.log('listing.image', listing.image);
-    console.log('listing.categoryId', listing.categoryId);
-    console.log('listing.categoryName', listing.categoryName);
-    console.log('listing.username', listing.username);
-    console.log('listing.statusName', listing.statusName);
-    console.log('------ map end ------');
-  });
-
   if (!userListings || userListings.length === 0) {
     return (
       <div>
@@ -113,11 +98,9 @@ export default function UserListings({
     );
   }
 
-  console.log(userListings);
   return (
     <>
       {userListings.map((listing) => {
-        console.log('listing.id: ', listing.id);
         return (
           <div
             key={`listing-id-${listing.id}`}

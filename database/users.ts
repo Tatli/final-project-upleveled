@@ -54,7 +54,6 @@ export const updateUserById = cache(
     password: string,
     phone: string,
     roleId: number,
-    image: string,
   ) => {
     const [user] = await sql<User[]>`
       UPDATE users
@@ -71,7 +70,6 @@ export const updateUserById = cache(
         password_hash = ${password},
         phone = ${phone},
         role_id = ${roleId},
-        image = ${image}
       WHERE
         id = ${id}
         RETURNING *

@@ -158,7 +158,6 @@ export default function CreateNewListing({
             className="input input-bordered sm:w-full lg:w-1/2 2xl:w-1/3 mb-2"
             onChange={(e) => {
               setPrice(Number(e.target.value));
-              console.log('price: ', price);
             }}
           />
         </div>
@@ -182,7 +181,6 @@ export default function CreateNewListing({
           className="textarea textarea-primary"
           onChange={(e) => {
             setDescription(e.currentTarget.value);
-            console.log('description:', description);
           }}
           placeholder="e.g. dimensions, size, reasons for sale, defects/defects if any."
         />

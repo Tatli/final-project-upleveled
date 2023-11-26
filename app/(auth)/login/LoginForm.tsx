@@ -30,14 +30,11 @@ export default function LoginForm() {
     },
 
     onError: (error) => {
-      console.log('username in onError: ', username);
-      console.log('password in onError: ', password);
       setOnError(error.message);
     },
 
     onCompleted: () => {
       // This might not be needed
-      console.log('onCompleted in loginHandler in LoginForm');
       router.refresh();
     },
   });

@@ -31,7 +31,6 @@ export default async function RootLayout({
       console.log(error);
     }));
 
-  console.log('loggedInUser in layout.tsx: ', loggedInUser);
   return (
     <html lang="en" data-theme="corporate">
       <body className={`${inter.className} `}>

@@ -33,7 +33,6 @@ export default async function CategoryPage(props: Props) {
   });
 
   const categoryId = Number(props.params.categoryId);
-  console.log('categoryId inside CategoryPage: ', categoryId);
 
   const category = data.category;
 
@@ -42,8 +41,6 @@ export default async function CategoryPage(props: Props) {
     height: 1024,
     src: category.image,
   });
-
-  console.log('url: ', categoryImageUrl);
 
   const sectionStyle = {
     backgroundImage: `url('${categoryImageUrl}')`,
@@ -56,10 +53,6 @@ export default async function CategoryPage(props: Props) {
 
   return (
     <>
-      {console.log(
-        'category.name inside [categoryId] before Head: ',
-        category.name,
-      )}
       <Head>
         <title>{`${category.name} | Firsthand`}</title>
         <meta
