@@ -4,6 +4,9 @@
 ## About
 The Firsthand Marketplace is a user-friendly web platform designed to facilitate the sale and purchase of secondhand items. With a focus on simplicity and user experience, it enables users to discover, purchase, and sell items with ease.
 
+## Deployed site 
+https://final-project-upleveled-tatli.fly.dev/
+
 ## Technologies used
 - [Next.js](https://nextjs.org/)
 - [React](https://react.dev/)
